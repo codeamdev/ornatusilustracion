@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String   @default("Admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+}
+
+model Product {
+  id           String      @id @default(uuid())
+  name         String
+  slug         String      @unique
+  description  String      @default("")
+  story        String      @default("")
+  inspiration  String      @default("")
+  materials    String      @default("")
+  dimensions   String      @default("")
+  year         Int?
+  edition      String      @default("Pieza única — 1/1")
+  creationTime String      @default("")
+  uniqueTraits String[]
+  price        Float?
+  images       String[]
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id])
+  featured     Boolean     @default(false)
+  active       Boolean     @default(true)
+  stock        Int         @default(0)
+  showStock    Boolean     @default(false)
+  views        Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  customerName  String
+  customerEmail String
+  customerPhone String
+  customerMsg   String      @default("")
+  status        OrderStatus @default(pending)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  image     String   @default("")
+  price     Float?
+  quantity  Int      @default(1)
+}
+
+model StockMovement {
+  id        String              @id @default(uuid())
+  productId String
+  delta     Int
+  reason    StockMovementReason
+  note      String              @default("")
+  createdAt DateTime            @default(now())
+}
+
+enum OrderStatus {
+  pending
+  contacted
+  completed
+  cancelled
+}
+
+enum StockMovementReason {
+  restock
+  sale
+  adjustment
+  return
+}
+
+// Configuración global del sitio — clave/valor
+model SiteConfig {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}

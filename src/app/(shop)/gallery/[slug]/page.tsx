@@ -1,0 +1,512 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import FadeIn from "@/components/shop/FadeIn";
+import Button from "@/components/ui/Button";
+import Spinner from "@/components/ui/Spinner";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/context/ToastContext";
+import type { IProduct, ICategory } from "@/types";
+
+function generateSerial(id: string, year: number | null): string {
+  const y = year || new Date().getFullYear();
+  const hash = id.slice(-6).toUpperCase();
+  return `ORN-${y}-${hash}`;
+}
+
+export default function ProductDetailPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const [product, setProduct] = useState<IProduct | null>(null);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/products/${slug}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          setProduct(res.data);
+          fetch(`/api/products/${res.data.id}/view`, { method: "POST" }).catch(() => {});
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) return <Spinner className="py-40" />;
+
+  if (!product) {
+    return (
+      <div className="pt-32 pb-24 px-6 text-center">
+        <h1 className="font-[family-name:var(--font-playfair)] text-3xl mb-4">
+          Producto no encontrado
+        </h1>
+        <Link
+          href="/gallery"
+          className="text-xs tracking-[0.2em] uppercase text-gallery-gray hover:text-gallery-black border-b border-gallery-border pb-1"
+        >
+          Volver a la galería
+        </Link>
+      </div>
+    );
+  }
+
+  const categoryName =
+    typeof product.category === "object"
+      ? (product.category as ICategory).name
+      : "";
+
+  const hasStory = product.story || product.inspiration;
+  const hasDetails = product.materials || product.dimensions || product.year;
+  const hasUniqueTraits = product.uniqueTraits && product.uniqueTraits.length > 0;
+  const serial = generateSerial(product.id, product.year);
+  const outOfStock = product.showStock && product.stock === 0;
+
+  function handleAddToCart() {
+    if (outOfStock) return;
+    addItem(product!);
+    toast("Añadido al carrito");
+  }
+
+  return (
+    <>
+      {/* ── Above the fold: Image + Purchase panel ── */}
+      <section className="pt-24 md:pt-28 px-6 md:px-12 max-w-7xl mx-auto">
+        <FadeIn>
+          <Link
+            href="/gallery"
+            className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-gallery-gray hover:text-gallery-black transition-colors duration-300 mb-6"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Galería
+          </Link>
+        </FadeIn>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left: Images */}
+          <FadeIn className="lg:col-span-7">
+            <div className="relative aspect-[4/5] bg-gallery-light overflow-hidden">
+              {product.images[selectedImage] ? (
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gallery-gray">
+                  Sin imagen
+                </div>
+              )}
+
+              {/* Edition badge */}
+              <div className="absolute top-4 left-4">
+                <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-3 py-1.5">
+                  {product.edition || "Pieza única — 1/1"}
+                </span>
+              </div>
+
+              {/* Serial watermark */}
+              <div className="absolute bottom-4 right-4">
+                <span className="bg-gallery-black/60 backdrop-blur-sm text-white/70 text-[9px] tracking-[0.2em] font-mono px-2.5 py-1">
+                  {serial}
+                </span>
+              </div>
+            </div>
+
+            {/* Thumbnails */}
+            {product.images.length > 1 && (
+              <div className="flex gap-2 mt-3">
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedImage(i)}
+                    className={`relative w-16 h-16 bg-gallery-light overflow-hidden border-2 transition-all duration-300 ${
+                      selectedImage === i
+                        ? "border-gallery-black"
+                        : "border-transparent hover:border-gallery-border"
+                    }`}
+                  >
+                    <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="64px" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </FadeIn>
+
+          {/* Right: Purchase panel — sticky */}
+          <FadeIn delay={150} className="lg:col-span-5">
+            <div className="lg:sticky lg:top-28 space-y-6">
+              {categoryName && (
+                <p className="text-[11px] tracking-[0.3em] uppercase text-gallery-gray">
+                  {categoryName}
+                </p>
+              )}
+
+              <h1 className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl md:text-4xl text-gallery-black leading-tight">
+                {product.name}
+              </h1>
+
+              {product.price != null ? (
+                <p className="text-2xl font-light text-gallery-black">
+                  €{product.price.toFixed(2)}
+                </p>
+              ) : (
+                <p className="text-sm text-gallery-gray italic">Precio a consultar</p>
+              )}
+
+              {/* Stock indicator — visible solo si showStock está activado */}
+              {product.showStock && (
+                <div className="flex items-center gap-2">
+                  {product.stock === 0 ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+                      <p className="text-sm text-red-600 font-medium">Sin stock disponible</p>
+                    </>
+                  ) : product.stock <= 2 ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
+                      <p className="text-sm text-amber-700 font-medium">
+                        Solo {product.stock} {product.stock === 1 ? "unidad disponible" : "unidades disponibles"}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                      <p className="text-sm text-green-700">{product.stock} unidades disponibles</p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {product.description && (
+                <p className="text-gallery-gray leading-relaxed text-sm border-t border-gallery-border/50 pt-5">
+                  {product.description}
+                </p>
+              )}
+
+              {/* Technical details */}
+              {hasDetails && (
+                <dl className="space-y-2.5 border-t border-gallery-border/50 pt-5">
+                  {product.materials && (
+                    <div className="flex justify-between text-sm">
+                      <dt className="text-gallery-gray">Técnica</dt>
+                      <dd className="text-gallery-black">{product.materials}</dd>
+                    </div>
+                  )}
+                  {product.dimensions && (
+                    <div className="flex justify-between text-sm">
+                      <dt className="text-gallery-gray">Dimensiones</dt>
+                      <dd className="text-gallery-black">{product.dimensions}</dd>
+                    </div>
+                  )}
+                  {product.year && (
+                    <div className="flex justify-between text-sm">
+                      <dt className="text-gallery-gray">Año</dt>
+                      <dd className="text-gallery-black">{product.year}</dd>
+                    </div>
+                  )}
+                  {product.creationTime && (
+                    <div className="flex justify-between text-sm">
+                      <dt className="text-gallery-gray">Tiempo de creación</dt>
+                      <dd className="text-gallery-black">{product.creationTime}</dd>
+                    </div>
+                  )}
+                </dl>
+              )}
+
+              {/* Unique traits chips */}
+              {hasUniqueTraits && (
+                <div className="border-t border-gallery-border/50 pt-5">
+                  <p className="text-[11px] tracking-[0.2em] uppercase text-gallery-gray mb-3">
+                    Lo que hace única esta pieza
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {product.uniqueTraits.map((trait, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1.5 text-xs text-gallery-black bg-gallery-light px-3 py-1.5"
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 text-gallery-gray">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="currentColor" />
+                        </svg>
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CTA buttons */}
+              <div className="space-y-3 pt-2">
+                <Button
+                  size="lg"
+                  className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleAddToCart}
+                  disabled={outOfStock}
+                >
+                  {outOfStock ? "Sin stock disponible" : "Añadir al carrito"}
+                </Button>
+
+                <a
+                  href={`https://wa.me/34600000000?text=Hola, me interesa "${product.name}" (${serial})`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center py-3 border border-gallery-border text-gallery-gray text-xs tracking-[0.15em] uppercase hover:border-gallery-black hover:text-gallery-black transition-all duration-300"
+                >
+                  Consultar por WhatsApp
+                </a>
+              </div>
+
+              {/* Trust signals */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+                  Certificado firmado
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="1" y="3" width="15" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M16 8h4l3 3v5a2 2 0 01-2 2h-1M6 21a2 2 0 100-4 2 2 0 000 4zM17 21a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  Envío asegurado
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Hecho a mano
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Nunca reproducida
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ── Uniqueness Certificate ── */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
+        <FadeIn>
+          <div className="border border-gallery-border p-8 md:p-12 max-w-3xl mx-auto relative">
+            {/* Corner decorations */}
+            <div className="absolute top-3 left-3 w-4 h-4 border-t border-l border-gallery-black/30" />
+            <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-gallery-black/30" />
+            <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-gallery-black/30" />
+            <div className="absolute bottom-3 right-3 w-4 h-4 border-b border-r border-gallery-black/30" />
+
+            <div className="text-center mb-8">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 text-gallery-black/60">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gallery-gray mb-2">
+                Certificado de Unicidad
+              </p>
+              <h2 className="font-[family-name:var(--font-playfair)] text-2xl md:text-3xl text-gallery-black">
+                {product.name}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-8 border-y border-gallery-border/50 py-6">
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
+                  Edición
+                </p>
+                <p className="text-sm font-medium text-gallery-black">
+                  {product.edition || "1/1"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
+                  Referencia
+                </p>
+                <p className="text-sm font-mono text-gallery-black">
+                  {serial}
+                </p>
+              </div>
+              {product.creationTime && (
+                <div>
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
+                    Tiempo de creación
+                  </p>
+                  <p className="text-sm font-medium text-gallery-black">
+                    {product.creationTime}
+                  </p>
+                </div>
+              )}
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
+                  Año
+                </p>
+                <p className="text-sm font-medium text-gallery-black">
+                  {product.year || new Date().getFullYear()}
+                </p>
+              </div>
+            </div>
+
+            {/* Unique traits */}
+            {hasUniqueTraits && (
+              <div className="mb-8">
+                <p className="text-[10px] tracking-[0.3em] uppercase text-gallery-gray text-center mb-4">
+                  Lo que hace irrepetible esta obra
+                </p>
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                  {product.uniqueTraits.map((trait, i) => (
+                    <span key={i} className="flex items-center gap-2 text-sm text-gallery-black">
+                      <span className="w-1 h-1 rounded-full bg-gallery-black/40" />
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {product.materials && (
+              <p className="text-center text-xs text-gallery-gray">
+                {product.materials}
+                {product.dimensions ? ` — ${product.dimensions}` : ""}
+              </p>
+            )}
+
+            <div className="text-center mt-8">
+              <p className="font-[family-name:var(--font-playfair)] text-lg italic text-gallery-black/60">
+                Ornatus
+              </p>
+              <div className="w-16 h-px bg-gallery-border mx-auto mt-2" />
+            </div>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* ── Storytelling ── */}
+      {hasStory && (
+        <section className="max-w-7xl mx-auto px-6 md:px-12 pb-20 md:pb-28">
+          <div className="max-w-3xl">
+            {product.story && (
+              <FadeIn>
+                <div className="mb-16">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-8 h-px bg-gallery-black" />
+                    <h2 className="text-xs tracking-[0.3em] uppercase text-gallery-gray">
+                      La Historia
+                    </h2>
+                  </div>
+                  <p className="text-gallery-gray leading-[1.9] text-base whitespace-pre-line">
+                    {product.story}
+                  </p>
+                </div>
+              </FadeIn>
+            )}
+
+            {product.inspiration && (
+              <FadeIn delay={150}>
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-8 h-px bg-gallery-black" />
+                    <h2 className="text-xs tracking-[0.3em] uppercase text-gallery-gray">
+                      Inspiración
+                    </h2>
+                  </div>
+                  <blockquote className="border-l-2 border-gallery-border pl-6">
+                    <p className="font-[family-name:var(--font-playfair)] text-lg md:text-xl leading-relaxed text-gallery-black/80 italic">
+                      {product.inspiration}
+                    </p>
+                  </blockquote>
+                </div>
+              </FadeIn>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ── Cinematic second image ── */}
+      {product.images.length > 1 && (
+        <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+          <Image
+            src={product.images[1]}
+            alt={`${product.name} — detalle`}
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gallery-black/10" />
+        </section>
+      )}
+
+      {/* ── Artist note fallback ── */}
+      {!hasStory && (
+        <FadeIn>
+          <section className="bg-gallery-light py-20 md:py-28">
+            <div className="max-w-2xl mx-auto px-6 md:px-12 text-center">
+              <p className="font-[family-name:var(--font-playfair)] text-xl md:text-2xl leading-relaxed text-gallery-black/80 italic">
+                &ldquo;Cada pieza lleva un fragmento de lo que siento. No es solo un
+                objeto — es una conversación silenciosa entre mi mundo interior y el
+                tuyo.&rdquo;
+              </p>
+              <p className="mt-6 text-xs tracking-[0.3em] uppercase text-gallery-gray">
+                — La Artista
+              </p>
+            </div>
+          </section>
+        </FadeIn>
+      )}
+
+      {/* ── Process gallery ── */}
+      {product.images.length > 2 && (
+        <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
+          <FadeIn>
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-8 h-px bg-gallery-black" />
+              <h2 className="text-xs tracking-[0.3em] uppercase text-gallery-gray">
+                El Proceso
+              </h2>
+            </div>
+          </FadeIn>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            {product.images.slice(2).map((img, i) => (
+              <FadeIn key={i} delay={i * 100}>
+                <div className="relative aspect-square bg-gallery-light overflow-hidden group">
+                  <Image
+                    src={img}
+                    alt={`${product.name} — proceso ${i + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                  />
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Sticky mobile purchase bar ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-gallery-border px-4 py-3 flex items-center justify-between gap-4 lg:hidden">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-gallery-black truncate">{product.name}</p>
+          {product.price != null && (
+            <p className="text-xs text-gallery-gray">€{product.price.toFixed(2)}</p>
+          )}
+        </div>
+        <button
+          onClick={handleAddToCart}
+          disabled={outOfStock}
+          aria-label={outOfStock ? "Sin stock" : `Añadir ${product.name} al carrito`}
+          className="flex-shrink-0 bg-gallery-accent text-white px-6 py-2.5 text-xs tracking-[0.15em] uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {outOfStock ? "Sin stock" : "Añadir"}
+        </button>
+      </div>
+      <div className="h-16 lg:hidden" />
+    </>
+  );
+}

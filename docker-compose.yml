@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Imágenes subidas — persisten en el host aunque el contenedor se reconstruya
+      - /var/www/ornatus/uploads:/app/public/uploads
+    environment:
+      # Base de datos local del servidor (host.docker.internal apunta al host en Linux)
+      DATABASE_URL: "postgresql://postgres:posgres@host.docker.internal:5432/ornatus"
+      JWT_SECRET: "CAMBIAR_POR_SECRETO_ALEATORIO"
+      SMTP_HOST: "mail.ornatusilustracion.com"
+      SMTP_PORT: "587"
+      SMTP_SECURE: "false"
+      SMTP_USER: "noreply@ornatusilustracion.com"
+      SMTP_PASS: "CAMBIAR_POR_CONTRASEÑA_SMTP"
+      FROM_EMAIL: "noreply@ornatusilustracion.com"
+      ADMIN_EMAIL: "admin@ornatusilustracion.com"
+    extra_hosts:
+      # Permite conectarse a PostgreSQL en el host Linux desde el contenedor
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <rect width="800" height="1000" fill="hsl(90, 5%, 78%)"/>
+  <rect x="100" y="200" width="600" height="600" fill="hsl(90, 8%, 88%)" opacity="0.5"/>
+  <rect x="200" y="300" width="400" height="400" fill="hsl(90, 10%, 83%)" opacity="0.3"/>
+</svg>
