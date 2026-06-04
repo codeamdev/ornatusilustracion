@@ -8,6 +8,8 @@ services:
       # Imágenes subidas — persisten en el host aunque el contenedor se reconstruya
       - /var/www/ornatus/uploads:/app/public/uploads
     environment:
+      SITE_URL: "https://www.ornatusilustracion.com"
+      GOOGLE_SITE_VERIFICATION: ""   # pegar aquí el código de Google Search Console
       # Base de datos local del servidor (host.docker.internal apunta al host en Linux)
       DATABASE_URL: "postgresql://postgres:posgres@host.docker.internal:5432/ornatus"
       JWT_SECRET: "CAMBIAR_POR_SECRETO_ALEATORIO"
