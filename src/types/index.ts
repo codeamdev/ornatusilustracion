@@ -1,6 +1,7 @@
 export interface ICategory {
   id: string;
   name: string;
+  name_en: string;
   slug: string;
   createdAt: string;
 }
@@ -10,14 +11,21 @@ export interface IProduct {
   name: string;
   slug: string;
   description: string;
+  description_en: string;
   story: string;
+  story_en: string;
   inspiration: string;
+  inspiration_en: string;
   materials: string;
+  materials_en: string;
   dimensions: string;
   year: number | null;
   edition: string;
+  edition_en: string;
   creationTime: string;
+  creationTime_en: string;
   uniqueTraits: string[];
+  uniqueTraits_en: string[];
   price: number | null;
   images: string[];
   category: ICategory | string;

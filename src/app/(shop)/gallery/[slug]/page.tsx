@@ -11,6 +11,7 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useConfig } from "@/context/ConfigContext";
+import { localizeProduct } from "@/lib/localize-product";
 import type { IProduct, ICategory } from "@/types";
 
 function generateSerial(id: string, year: number | null): string {
@@ -24,7 +25,7 @@ export default function ProductDetailPage() {
   const slug = params.slug as string;
   const { addItem } = useCart();
   const { toast } = useToast();
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const { whatsapp_number } = useConfig();
 
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -62,14 +63,16 @@ export default function ProductDetailPage() {
     );
   }
 
+  const p = localizeProduct(product, locale);
+
   const categoryName =
-    typeof product.category === "object"
-      ? (product.category as ICategory).name
+    typeof p.category === "object"
+      ? (p.category as ICategory).name
       : "";
 
-  const hasStory = product.story || product.inspiration;
-  const hasDetails = product.materials || product.dimensions || product.year;
-  const hasUniqueTraits = product.uniqueTraits && product.uniqueTraits.length > 0;
+  const hasStory = p.story || p.inspiration;
+  const hasDetails = p.materials || product.dimensions || product.year;
+  const hasUniqueTraits = p.uniqueTraits && p.uniqueTraits.length > 0;
   const serial = generateSerial(product.id, product.year);
   const outOfStock = product.showStock && product.stock === 0;
 
@@ -120,7 +123,7 @@ export default function ProductDetailPage() {
               {/* Edition badge */}
               <div className="absolute top-4 left-4">
                 <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-3 py-1.5">
-                  {product.edition || "Pieza única — 1/1"}
+                  {p.edition || "Pieza única — 1/1"}
                 </span>
               </div>
 
@@ -201,19 +204,19 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {product.description && (
+              {p.description && (
                 <p className="text-gallery-gray leading-relaxed text-sm border-t border-gallery-border/50 pt-5">
-                  {product.description}
+                  {p.description}
                 </p>
               )}
 
               {/* Technical details */}
               {hasDetails && (
                 <dl className="space-y-2.5 border-t border-gallery-border/50 pt-5">
-                  {product.materials && (
+                  {p.materials && (
                     <div className="flex justify-between text-sm">
                       <dt className="text-gallery-gray">{t("product.technique")}</dt>
-                      <dd className="text-gallery-black">{product.materials}</dd>
+                      <dd className="text-gallery-black">{p.materials}</dd>
                     </div>
                   )}
                   {product.dimensions && (
@@ -228,10 +231,10 @@ export default function ProductDetailPage() {
                       <dd className="text-gallery-black">{product.year}</dd>
                     </div>
                   )}
-                  {product.creationTime && (
+                  {p.creationTime && (
                     <div className="flex justify-between text-sm">
                       <dt className="text-gallery-gray">{t("product.creationTime")}</dt>
-                      <dd className="text-gallery-black">{product.creationTime}</dd>
+                      <dd className="text-gallery-black">{p.creationTime}</dd>
                     </div>
                   )}
                 </dl>
@@ -244,7 +247,7 @@ export default function ProductDetailPage() {
                     {t("product.whatMakesItUnique")}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {product.uniqueTraits.map((trait, i) => (
+                    {p.uniqueTraits.map((trait, i) => (
                       <span
                         key={i}
                         className="inline-flex items-center gap-1.5 text-xs text-gallery-black bg-gallery-light px-3 py-1.5"
@@ -332,7 +335,7 @@ export default function ProductDetailPage() {
                   {t("product.edition")}
                 </p>
                 <p className="text-sm font-medium text-gallery-black">
-                  {product.edition || "1/1"}
+                  {p.edition || "1/1"}
                 </p>
               </div>
               <div>
@@ -343,13 +346,13 @@ export default function ProductDetailPage() {
                   {serial}
                 </p>
               </div>
-              {product.creationTime && (
+              {p.creationTime && (
                 <div>
                   <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
                     {t("product.creationTime")}
                   </p>
                   <p className="text-sm font-medium text-gallery-black">
-                    {product.creationTime}
+                    {p.creationTime}
                   </p>
                 </div>
               )}
@@ -369,7 +372,7 @@ export default function ProductDetailPage() {
                   {t("product.whatMakesItUnrepeatable")}
                 </p>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-                  {product.uniqueTraits.map((trait, i) => (
+                  {p.uniqueTraits.map((trait, i) => (
                     <span key={i} className="flex items-center gap-2 text-sm text-gallery-black">
                       <span className="w-1 h-1 rounded-full bg-gallery-black/40" />
                       {trait}
@@ -379,9 +382,9 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {product.materials && (
+            {p.materials && (
               <p className="text-center text-xs text-gallery-gray">
-                {product.materials}
+                {p.materials}
                 {product.dimensions ? ` — ${product.dimensions}` : ""}
               </p>
             )}
@@ -400,7 +403,7 @@ export default function ProductDetailPage() {
       {hasStory && (
         <section className="max-w-7xl mx-auto px-6 md:px-12 pb-20 md:pb-28">
           <div className="max-w-3xl">
-            {product.story && (
+            {p.story && (
               <FadeIn>
                 <div className="mb-16">
                   <div className="flex items-center gap-4 mb-6">
@@ -410,13 +413,13 @@ export default function ProductDetailPage() {
                     </h2>
                   </div>
                   <p className="text-gallery-gray leading-[1.9] text-base whitespace-pre-line">
-                    {product.story}
+                    {p.story}
                   </p>
                 </div>
               </FadeIn>
             )}
 
-            {product.inspiration && (
+            {p.inspiration && (
               <FadeIn delay={150}>
                 <div>
                   <div className="flex items-center gap-4 mb-6">
@@ -427,7 +430,7 @@ export default function ProductDetailPage() {
                   </div>
                   <blockquote className="border-l-2 border-gallery-border pl-6">
                     <p className="font-[family-name:var(--font-playfair)] text-lg md:text-xl leading-relaxed text-gallery-black/80 italic">
-                      {product.inspiration}
+                      {p.inspiration}
                     </p>
                   </blockquote>
                 </div>

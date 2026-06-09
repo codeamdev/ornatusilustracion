@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name } = await req.json();
+    const { name, name_en } = await req.json();
     if (!name?.trim()) {
       return NextResponse.json(
         { success: false, error: "El nombre de categoría es requerido" },
@@ -39,7 +39,11 @@ export async function POST(req: NextRequest) {
     }
 
     const category = await prisma.category.create({
-      data: { name: name.trim(), slug: toSlug(name.trim()) },
+      data: {
+        name: name.trim(),
+        slug: toSlug(name.trim()),
+        name_en: name_en?.trim() ?? "",
+      },
     });
     return NextResponse.json({ success: true, data: category }, { status: 201 });
   } catch (err: unknown) {

@@ -23,7 +23,7 @@ export async function GET(
 
     const product = await prisma.product.findFirst({
       where: { ...where, active: true },
-      include: { category: { select: { id: true, name: true, slug: true } } },
+      include: { category: { select: { id: true, name: true, name_en: true, slug: true } } },
     });
 
     if (!product) {
@@ -59,7 +59,7 @@ export async function PUT(
     const product = await prisma.product.update({
       where: { id },
       data: updateData,
-      include: { category: { select: { id: true, name: true, slug: true } } },
+      include: { category: { select: { id: true, name: true, name_en: true, slug: true } } },
     });
 
     return NextResponse.json({ success: true, data: product });

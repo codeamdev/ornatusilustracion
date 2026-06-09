@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useConfig } from "@/context/ConfigContext";
+import { useLocalizedConfig } from "@/hooks/useLocalizedConfig";
 import { useLocale } from "@/context/LocaleContext";
 
 export default function Footer() {
@@ -13,7 +13,7 @@ export default function Footer() {
     instagram_url,
     facebook_url,
     tiktok_url,
-  } = useConfig();
+  } = useLocalizedConfig();
   const { t } = useLocale();
 
   const socials = [

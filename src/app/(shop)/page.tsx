@@ -6,7 +6,7 @@ import Link from "next/link";
 import FadeIn from "@/components/shop/FadeIn";
 import ProductGrid from "@/components/shop/ProductGrid";
 import Spinner from "@/components/ui/Spinner";
-import { useConfig } from "@/context/ConfigContext";
+import { useLocalizedConfig } from "@/hooks/useLocalizedConfig";
 import { useLocale } from "@/context/LocaleContext";
 import type { IProduct } from "@/types";
 
@@ -23,7 +23,7 @@ export default function Home() {
     artist_name,
     commission_title,
     commission_description,
-  } = useConfig();
+  } = useLocalizedConfig();
   const { t } = useLocale();
 
   useEffect(() => {

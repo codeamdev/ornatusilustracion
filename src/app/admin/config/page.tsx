@@ -5,39 +5,49 @@ import { useToast } from "@/context/ToastContext";
 import type { SiteConfigMap } from "@/lib/site-config";
 import { CONFIG_DEFAULTS } from "@/lib/site-config";
 
-type Section = {
-  title: string;
-  description: string;
-  fields: Field[];
-};
-
 type Field = {
   key: keyof SiteConfigMap;
   label: string;
   type: "text" | "textarea" | "url" | "email" | "tel" | "color";
   placeholder?: string;
   rows?: number;
+  en_key?: keyof SiteConfigMap;
+  en_placeholder?: string;
 };
 
+type Section = {
+  title: string;
+  description: string;
+  fields: Field[];
+};
+
+const PALETTES = [
+  { name: "Tierra", accent: "#A67C52", black: "#1C1917", white: "#FAF8F4", gray: "#78716C", light: "#F0ECE5", border: "#DDD6CB" },
+  { name: "Noir", accent: "#D4B483", black: "#111111", white: "#F8F8F8", gray: "#888888", light: "#EEEEEE", border: "#CCCCCC" },
+  { name: "Bosque", accent: "#5C8A5C", black: "#1A2420", white: "#F4F8F4", gray: "#6B8068", light: "#E8F0E8", border: "#C5D5C5" },
+  { name: "Cielo", accent: "#4A7FA5", black: "#1A2530", white: "#F4F7FA", gray: "#627585", light: "#E8EFF5", border: "#C5D5E0" },
+  { name: "Rosa", accent: "#C47B8C", black: "#2A1A1F", white: "#FDF5F7", gray: "#8C6B73", light: "#F5E8EC", border: "#E0C5CC" },
+  { name: "Índigo", accent: "#6B5FA6", black: "#1A1830", white: "#F6F5FC", gray: "#7B78A0", light: "#EEECF8", border: "#D0CDE8" },
+  { name: "Ámbar", accent: "#D4940A", black: "#1C1500", white: "#FEFDF0", gray: "#8C7A20", light: "#F8F2DC", border: "#E5D8A0" },
+  { name: "Vino", accent: "#8C2D4A", black: "#1A0A12", white: "#FDF5F7", gray: "#7A4055", light: "#F5E5EA", border: "#E0C0CC" },
+  { name: "Minimal", accent: "#555555", black: "#222222", white: "#FAFAFA", gray: "#999999", light: "#F0F0F0", border: "#E0E0E0" },
+  { name: "Arena", accent: "#C49A6C", black: "#2C2015", white: "#FDFAF5", gray: "#8C7860", light: "#F5EFE0", border: "#E5D8C0" },
+];
+
 const SECTIONS: Section[] = [
-  {
-    title: "Colores",
-    description: "Paleta principal del sitio. Los cambios se aplican en tiempo real.",
-    fields: [
-      { key: "color_accent", label: "Color de acento (botones, badges)", type: "color" as Field["type"] },
-      { key: "color_black", label: "Color principal / texto", type: "color" as Field["type"] },
-      { key: "color_white", label: "Color de fondo", type: "color" as Field["type"] },
-      { key: "color_gray", label: "Texto secundario", type: "color" as Field["type"] },
-      { key: "color_light", label: "Fondo de secciones claras", type: "color" as Field["type"] },
-      { key: "color_border", label: "Bordes y separadores", type: "color" as Field["type"] },
-    ],
-  },
   {
     title: "Identidad",
     description: "Nombre del sitio y datos generales de la marca.",
     fields: [
       { key: "site_name", label: "Nombre del sitio", type: "text", placeholder: "Ornatus" },
-      { key: "site_tagline", label: "Eslogan", type: "text", placeholder: "Arte Hecho a Mano" },
+      {
+        key: "site_tagline",
+        label: "Eslogan",
+        type: "text",
+        placeholder: "Arte Hecho a Mano",
+        en_key: "site_tagline_en",
+        en_placeholder: "Handmade Art",
+      },
       { key: "artist_name", label: "Nombre de la artista", type: "text", placeholder: "La Artista" },
       {
         key: "site_description",
@@ -45,6 +55,8 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 3,
         placeholder: "Galería de arte contemporáneo…",
+        en_key: "site_description_en",
+        en_placeholder: "Contemporary art gallery…",
       },
     ],
   },
@@ -52,13 +64,22 @@ const SECTIONS: Section[] = [
     title: "Hero (Página Principal)",
     description: "Textos e imagen del banner principal.",
     fields: [
-      { key: "hero_title", label: "Título del Hero", type: "text", placeholder: "Ornatus" },
+      {
+        key: "hero_title",
+        label: "Título del Hero",
+        type: "text",
+        placeholder: "Ornatus",
+        en_key: "hero_title_en",
+        en_placeholder: "Ornatus",
+      },
       {
         key: "hero_subtitle",
         label: "Subtítulo del Hero",
         type: "textarea",
         rows: 2,
         placeholder: "Piezas únicas hechas a mano…",
+        en_key: "hero_subtitle_en",
+        en_placeholder: "Unique handmade pieces…",
       },
       {
         key: "hero_image_url",
@@ -66,8 +87,22 @@ const SECTIONS: Section[] = [
         type: "url",
         placeholder: "https://… (dejar vacío para usar imagen del primer producto)",
       },
-      { key: "hero_cta_primary", label: "Botón principal", type: "text", placeholder: "Explorar Colección" },
-      { key: "hero_cta_secondary", label: "Botón secundario", type: "text", placeholder: "Encargar Pieza" },
+      {
+        key: "hero_cta_primary",
+        label: "Botón principal",
+        type: "text",
+        placeholder: "Explorar Colección",
+        en_key: "hero_cta_primary_en",
+        en_placeholder: "Explore Collection",
+      },
+      {
+        key: "hero_cta_secondary",
+        label: "Botón secundario",
+        type: "text",
+        placeholder: "Encargar Pieza",
+        en_key: "hero_cta_secondary_en",
+        en_placeholder: "Commission a Piece",
+      },
     ],
   },
   {
@@ -80,14 +115,25 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 3,
         placeholder: "Cada obra es una conversación entre…",
+        en_key: "statement_quote_en",
+        en_placeholder: "Each piece is a conversation between…",
       },
-      { key: "commission_title", label: "Título de encargos", type: "text", placeholder: "¿Buscas algo hecho solo para ti?" },
+      {
+        key: "commission_title",
+        label: "Título de encargos",
+        type: "text",
+        placeholder: "¿Buscas algo hecho solo para ti?",
+        en_key: "commission_title_en",
+        en_placeholder: "Looking for something made just for you?",
+      },
       {
         key: "commission_description",
         label: "Descripción de encargos",
         type: "textarea",
         rows: 3,
         placeholder: "Creo piezas por encargo…",
+        en_key: "commission_description_en",
+        en_placeholder: "I create custom pieces tailored to your space…",
       },
     ],
   },
@@ -107,6 +153,8 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 4,
         placeholder: "Artista multidisciplinar con más de…",
+        en_key: "artist_bio_1_en",
+        en_placeholder: "Multidisciplinary artist with more than…",
       },
       {
         key: "artist_bio_2",
@@ -114,6 +162,8 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 4,
         placeholder: "Desde murales que transforman…",
+        en_key: "artist_bio_2_en",
+        en_placeholder: "From murals that transform spaces…",
       },
       {
         key: "artist_process_1",
@@ -121,6 +171,8 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 4,
         placeholder: "Cada pieza comienza con una idea…",
+        en_key: "artist_process_1_en",
+        en_placeholder: "Each piece begins with an idea…",
       },
       {
         key: "artist_process_2",
@@ -128,6 +180,8 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 4,
         placeholder: "Utilizo materiales de alta calidad…",
+        en_key: "artist_process_2_en",
+        en_placeholder: "I use high quality materials…",
       },
     ],
   },
@@ -153,6 +207,8 @@ const SECTIONS: Section[] = [
         type: "textarea",
         rows: 3,
         placeholder: "Arte hecho a mano con pasión…",
+        en_key: "footer_tagline_en",
+        en_placeholder: "Handmade art with passion…",
       },
     ],
   },
@@ -160,16 +216,34 @@ const SECTIONS: Section[] = [
     title: "SEO",
     description: "Títulos y descripciones para motores de búsqueda.",
     fields: [
-      { key: "meta_title", label: "Meta título", type: "text", placeholder: "Ornatus — Arte Hecho a Mano" },
+      {
+        key: "meta_title",
+        label: "Meta título",
+        type: "text",
+        placeholder: "Ornatus — Arte Hecho a Mano",
+        en_key: "meta_title_en",
+        en_placeholder: "Ornatus — Handmade Art",
+      },
       {
         key: "meta_description",
         label: "Meta descripción",
         type: "textarea",
         rows: 3,
         placeholder: "Galería de arte contemporáneo…",
+        en_key: "meta_description_en",
+        en_placeholder: "Contemporary art gallery…",
       },
     ],
   },
+];
+
+const COLOR_FIELDS: Field[] = [
+  { key: "color_accent", label: "Color de acento (botones, badges)", type: "color" },
+  { key: "color_black", label: "Color principal / texto", type: "color" },
+  { key: "color_white", label: "Color de fondo", type: "color" },
+  { key: "color_gray", label: "Texto secundario", type: "color" },
+  { key: "color_light", label: "Fondo de secciones claras", type: "color" },
+  { key: "color_border", label: "Bordes y separadores", type: "color" },
 ];
 
 export default function AdminConfigPage() {
@@ -200,14 +274,16 @@ export default function AdminConfigPage() {
     setSaved(false);
   }
 
-  function handleResetSection(fields: Field[]) {
-    setValues((prev) => {
-      const next = { ...prev };
-      for (const f of fields) {
-        next[f.key] = CONFIG_DEFAULTS[f.key];
-      }
-      return next;
-    });
+  function applyPalette(p: typeof PALETTES[0]) {
+    setValues((prev) => ({
+      ...prev,
+      color_accent: p.accent,
+      color_black: p.black,
+      color_white: p.white,
+      color_gray: p.gray,
+      color_light: p.light,
+      color_border: p.border,
+    }));
     setSaved(false);
   }
 
@@ -231,6 +307,53 @@ export default function AdminConfigPage() {
     }
   }
 
+  function renderInput(field: Field) {
+    if (field.type === "color") {
+      return (
+        <div className="flex items-center gap-3">
+          <input
+            type="color"
+            value={values[field.key] || "#000000"}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            className="w-10 h-10 rounded border border-gray-300 cursor-pointer p-0.5 bg-white"
+          />
+          <input
+            type="text"
+            value={values[field.key]}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            placeholder="#000000"
+            maxLength={7}
+            className="w-32 border border-gray-300 rounded px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2C2520]/30 focus:border-[#2C2520]"
+          />
+          <div
+            className="w-8 h-8 rounded border border-gray-200"
+            style={{ backgroundColor: values[field.key] }}
+          />
+        </div>
+      );
+    }
+    if (field.type === "textarea") {
+      return (
+        <textarea
+          value={values[field.key]}
+          onChange={(e) => handleChange(field.key, e.target.value)}
+          rows={field.rows ?? 3}
+          placeholder={field.placeholder}
+          className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2C2520]/30 focus:border-[#2C2520] resize-y"
+        />
+      );
+    }
+    return (
+      <input
+        type={field.type}
+        value={values[field.key]}
+        onChange={(e) => handleChange(field.key, e.target.value)}
+        placeholder={field.placeholder}
+        className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2C2520]/30 focus:border-[#2C2520]"
+      />
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64 text-gallery-gray text-sm">
@@ -238,6 +361,13 @@ export default function AdminConfigPage() {
       </div>
     );
   }
+
+  const currentPalette = PALETTES.find(
+    (p) =>
+      p.accent === values.color_accent &&
+      p.black === values.color_black &&
+      p.white === values.color_white
+  );
 
   return (
     <form onSubmit={handleSave} className="max-w-3xl mx-auto px-6 py-8 space-y-12">
@@ -258,65 +388,109 @@ export default function AdminConfigPage() {
         </button>
       </div>
 
-      {/* Sections */}
+      {/* Colors section — palette picker + individual controls */}
+      <section className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-800">Colores</h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Elige una paleta predefinida o ajusta los colores individualmente.
+          </p>
+        </div>
+
+        {/* Palette picker */}
+        <div className="px-6 pt-5 pb-2">
+          <p className="text-xs font-medium text-gray-600 mb-3 tracking-wide uppercase">Paletas predefinidas</p>
+          <div className="grid grid-cols-5 gap-2">
+            {PALETTES.map((palette) => {
+              const isActive = currentPalette?.name === palette.name;
+              return (
+                <button
+                  key={palette.name}
+                  type="button"
+                  onClick={() => applyPalette(palette)}
+                  className={`group relative flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
+                    isActive
+                      ? "border-gray-800 shadow-sm"
+                      : "border-transparent hover:border-gray-300"
+                  }`}
+                >
+                  {/* Color swatches */}
+                  <div className="flex gap-0.5">
+                    <div className="w-4 h-6 rounded-l-sm" style={{ backgroundColor: palette.black }} />
+                    <div className="w-4 h-6" style={{ backgroundColor: palette.accent }} />
+                    <div className="w-4 h-6 rounded-r-sm" style={{ backgroundColor: palette.light }} />
+                  </div>
+                  <span className="text-[10px] text-gray-600 font-medium">{palette.name}</span>
+                  {isActive && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-800 text-white rounded-full flex items-center justify-center text-[8px]">
+                      ✓
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Individual color fields */}
+        <div className="px-6 py-5 space-y-5 border-t border-gray-100 mt-3">
+          <p className="text-xs font-medium text-gray-600 tracking-wide uppercase">Ajuste fino</p>
+          {COLOR_FIELDS.map((field) => (
+            <div key={field.key}>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5 tracking-wide">
+                {field.label}
+              </label>
+              {renderInput(field)}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* All other sections */}
       {SECTIONS.map((section) => (
         <section key={section.title} className="border border-gray-200 rounded-lg overflow-hidden">
-          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-800">{section.title}</h2>
-              <p className="text-xs text-gray-500 mt-0.5">{section.description}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => handleResetSection(section.fields)}
-              className="flex-shrink-0 text-xs text-gray-400 hover:text-gray-700 underline underline-offset-2 transition-colors"
-            >
-              Restaurar defaults
-            </button>
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-800">{section.title}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{section.description}</p>
           </div>
-          <div className="px-6 py-5 space-y-5">
+          <div className="px-6 py-5 space-y-6">
             {section.fields.map((field) => (
-              <div key={field.key}>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5 tracking-wide">
-                  {field.label}
-                </label>
-                {field.type === "color" ? (
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={values[field.key] || "#000000"}
-                      onChange={(e) => handleChange(field.key, e.target.value)}
-                      className="w-10 h-10 rounded border border-gray-300 cursor-pointer p-0.5 bg-white"
-                    />
-                    <input
-                      type="text"
-                      value={values[field.key]}
-                      onChange={(e) => handleChange(field.key, e.target.value)}
-                      placeholder="#000000"
-                      maxLength={7}
-                      className="w-32 border border-gray-300 rounded px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2C2520]/30 focus:border-[#2C2520]"
-                    />
-                    <div
-                      className="w-8 h-8 rounded border border-gray-200"
-                      style={{ backgroundColor: values[field.key] }}
-                    />
+              <div key={field.key} className="space-y-3">
+                {/* ES field */}
+                <div>
+                  <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-1.5 tracking-wide">
+                    {field.label}
+                    {field.en_key && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-gray-100 text-gray-500">ES</span>
+                    )}
+                  </label>
+                  {renderInput(field)}
+                </div>
+                {/* EN field — only if field has en_key */}
+                {field.en_key && (
+                  <div>
+                    <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-1.5 tracking-wide">
+                      {field.label.replace(/—.*$/, "").trim()} — English
+                      <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-blue-50 text-blue-500">EN</span>
+                    </label>
+                    {field.type === "textarea" ? (
+                      <textarea
+                        value={values[field.en_key] as string}
+                        onChange={(e) => handleChange(field.en_key!, e.target.value)}
+                        rows={field.rows ?? 3}
+                        placeholder={field.en_placeholder ?? ""}
+                        className="w-full border border-blue-200 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 resize-y bg-blue-50/30"
+                      />
+                    ) : (
+                      <input
+                        type={field.type}
+                        value={values[field.en_key] as string}
+                        onChange={(e) => handleChange(field.en_key!, e.target.value)}
+                        placeholder={field.en_placeholder ?? ""}
+                        className="w-full border border-blue-200 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-blue-50/30"
+                      />
+                    )}
                   </div>
-                ) : field.type === "textarea" ? (
-                  <textarea
-                    value={values[field.key]}
-                    onChange={(e) => handleChange(field.key, e.target.value)}
-                    rows={field.rows ?? 3}
-                    placeholder={field.placeholder}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2C2520]/30 focus:border-[#2C2520] resize-y"
-                  />
-                ) : (
-                  <input
-                    type={field.type}
-                    value={values[field.key]}
-                    onChange={(e) => handleChange(field.key, e.target.value)}
-                    placeholder={field.placeholder}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2C2520]/30 focus:border-[#2C2520]"
-                  />
                 )}
               </div>
             ))}

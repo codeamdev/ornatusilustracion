@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { IProduct, ICategory } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
+import { useLocale } from "@/context/LocaleContext";
 
 interface ProductCardProps {
   product: IProduct;
@@ -13,10 +14,16 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
-  const categoryName =
-    typeof product.category === "object"
-      ? (product.category as ICategory).name
-      : "";
+  const { locale, t } = useLocale();
+
+  const cat = typeof product.category === "object" ? (product.category as ICategory) : null;
+  const categoryName = cat
+    ? (locale === "en" ? cat.name_en || cat.name : cat.name)
+    : "";
+  const editionLabel =
+    locale === "en"
+      ? product.edition_en || product.edition
+      : product.edition;
 
   const outOfStock = product.showStock && product.stock === 0;
 
@@ -45,7 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Edition badge */}
           <div className="absolute top-3 left-3">
             <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-2.5 py-1">
-              {product.edition || "Pieza única — 1/1"}
+              {editionLabel || "Pieza única — 1/1"}
             </span>
           </div>
 
@@ -54,15 +61,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="absolute top-3 right-3">
               {product.stock === 0 ? (
                 <span className="bg-red-600 text-white text-[10px] tracking-[0.1em] uppercase px-2.5 py-1">
-                  Sin stock
+                  {t("product.outOfStockBtn")}
                 </span>
               ) : product.stock <= 2 ? (
                 <span className="bg-amber-500 text-white text-[10px] tracking-[0.1em] uppercase px-2.5 py-1">
-                  Últimas {product.stock}
+                  {t("product.onlyUnits", { count: product.stock })}
                 </span>
               ) : (
                 <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.1em] uppercase px-2.5 py-1">
-                  {product.stock} disponibles
+                  {t("product.unitsAvailable", { count: product.stock })}
                 </span>
               )}
             </div>
@@ -76,12 +83,12 @@ export default function ProductCard({ product }: ProductCardProps) {
                   e.preventDefault();
                   if (outOfStock) return;
                   addItem(product);
-                  toast("Añadido al carrito");
+                  toast(t("product.addedToCart"));
                 }}
                 disabled={outOfStock}
                 className="w-full bg-white text-gallery-black text-xs tracking-[0.15em] uppercase py-2.5 hover:bg-gallery-light transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {outOfStock ? "Sin stock" : "Añadir al carrito"}
+                {outOfStock ? t("product.outOfStockBtn") : t("product.addToCart")}
               </button>
             </div>
           </div>
@@ -106,7 +113,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               €{product.price.toFixed(2)}
             </p>
           ) : (
-            <p className="text-xs text-gallery-gray italic">Consultar precio</p>
+            <p className="text-xs text-gallery-gray italic">{t("product.priceOnRequest")}</p>
           )}
 
           {/* Always-visible mobile add button */}
@@ -114,16 +121,16 @@ export default function ProductCard({ product }: ProductCardProps) {
             onClick={() => {
               if (outOfStock) return;
               addItem(product);
-              toast("Añadido al carrito");
+              toast(t("product.addedToCart"));
             }}
             disabled={outOfStock}
-            aria-label={`Añadir ${product.name} al carrito`}
+            aria-label={`${t("product.add")} ${product.name}`}
             className="md:hidden flex items-center gap-1.5 text-[11px] tracking-[0.1em] uppercase text-gallery-gray hover:text-gallery-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            {outOfStock ? "Sin stock" : "Añadir"}
+            {outOfStock ? t("product.outOfStockBtn") : t("product.add")}
           </button>
         </div>
       </div>

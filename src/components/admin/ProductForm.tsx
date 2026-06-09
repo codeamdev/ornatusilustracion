@@ -12,6 +12,48 @@ interface ProductFormProps {
   product?: IProduct;
 }
 
+function Textarea({
+  id,
+  label,
+  value,
+  onChange,
+  rows = 4,
+  placeholder,
+  lang,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  rows?: number;
+  placeholder?: string;
+  lang?: "es" | "en";
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2"
+      >
+        {label}
+        {lang && (
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${lang === "en" ? "bg-blue-50 text-blue-500" : "bg-gallery-light text-gallery-gray"}`}>
+            {lang.toUpperCase()}
+          </span>
+        )}
+      </label>
+      <textarea
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={rows}
+        className="w-full border border-gallery-border bg-transparent p-3 text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 resize-none rounded"
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
 export default function ProductForm({ product }: ProductFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -22,15 +64,23 @@ export default function ProductForm({ product }: ProductFormProps) {
 
   const [name, setName] = useState(product?.name || "");
   const [description, setDescription] = useState(product?.description || "");
+  const [descriptionEn, setDescriptionEn] = useState(product?.description_en || "");
   const [story, setStory] = useState(product?.story || "");
+  const [storyEn, setStoryEn] = useState(product?.story_en || "");
   const [inspiration, setInspiration] = useState(product?.inspiration || "");
+  const [inspirationEn, setInspirationEn] = useState(product?.inspiration_en || "");
   const [materials, setMaterials] = useState(product?.materials || "");
+  const [materialsEn, setMaterialsEn] = useState(product?.materials_en || "");
   const [dimensions, setDimensions] = useState(product?.dimensions || "");
   const [year, setYear] = useState(product?.year?.toString() || "");
   const [edition, setEdition] = useState(product?.edition || "Pieza única — 1/1");
+  const [editionEn, setEditionEn] = useState(product?.edition_en || "");
   const [creationTime, setCreationTime] = useState(product?.creationTime || "");
+  const [creationTimeEn, setCreationTimeEn] = useState(product?.creationTime_en || "");
   const [uniqueTraits, setUniqueTraits] = useState<string[]>(product?.uniqueTraits || []);
   const [newTrait, setNewTrait] = useState("");
+  const [uniqueTraitsEn, setUniqueTraitsEn] = useState<string[]>(product?.uniqueTraits_en || []);
+  const [newTraitEn, setNewTraitEn] = useState("");
   const [price, setPrice] = useState(product?.price?.toString() || "");
   const [categoryId, setCategoryId] = useState(
     typeof product?.category === "object"
@@ -59,14 +109,21 @@ export default function ProductForm({ product }: ProductFormProps) {
     const body = {
       name,
       description,
+      description_en: descriptionEn,
       story,
+      story_en: storyEn,
       inspiration,
+      inspiration_en: inspirationEn,
       materials,
+      materials_en: materialsEn,
       dimensions,
       year: year ? parseInt(year) : null,
       edition,
+      edition_en: editionEn,
       creationTime,
+      creationTime_en: creationTimeEn,
       uniqueTraits,
+      uniqueTraits_en: uniqueTraitsEn,
       price: price ? parseFloat(price) : null,
       category: categoryId,
       images,
@@ -112,22 +169,22 @@ export default function ProductForm({ product }: ProductFormProps) {
           required
         />
 
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2"
-          >
-            Descripción
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-            className="w-full border border-gallery-border bg-transparent p-3 text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 resize-none rounded"
-            placeholder="Descripción del producto..."
-          />
-        </div>
+        <Textarea
+          id="description"
+          label="Descripción"
+          value={description}
+          onChange={setDescription}
+          placeholder="Descripción del producto..."
+          lang="es"
+        />
+        <Textarea
+          id="description_en"
+          label="Description (English)"
+          value={descriptionEn}
+          onChange={setDescriptionEn}
+          placeholder="Product description in English..."
+          lang="en"
+        />
 
         <div className="grid grid-cols-2 gap-6">
           <Input
@@ -168,28 +225,36 @@ export default function ProductForm({ product }: ProductFormProps) {
         <div className="grid grid-cols-2 gap-6">
           <Input
             id="materials"
-            label="Materiales / Técnica"
+            label="Materiales / Técnica — ES"
             value={materials}
             onChange={(e) => setMaterials(e.target.value)}
             placeholder="Ej: Óleo sobre lienzo"
           />
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              id="dimensions"
-              label="Dimensiones"
-              value={dimensions}
-              onChange={(e) => setDimensions(e.target.value)}
-              placeholder="Ej: 120 × 90 cm"
-            />
-            <Input
-              id="year"
-              label="Año"
-              type="number"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="2024"
-            />
-          </div>
+          <Input
+            id="materials_en"
+            label="Materials / Technique — EN"
+            value={materialsEn}
+            onChange={(e) => setMaterialsEn(e.target.value)}
+            placeholder="E.g.: Oil on canvas"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            id="dimensions"
+            label="Dimensiones"
+            value={dimensions}
+            onChange={(e) => setDimensions(e.target.value)}
+            placeholder="Ej: 120 × 90 cm"
+          />
+          <Input
+            id="year"
+            label="Año"
+            type="number"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder="2024"
+          />
         </div>
 
         <div className="flex gap-6">
@@ -274,44 +339,45 @@ export default function ProductForm({ product }: ProductFormProps) {
             Narrativa emocional
           </h3>
           <p className="text-xs text-gallery-gray mb-5">
-            Estas historias aparecen en la página del producto para conectar
-            emocionalmente con el visitante.
+            Estas historias aparecen en la página del producto. Si se rellena la versión EN, se mostrará cuando el visitante tenga el idioma en inglés.
           </p>
 
           <div className="space-y-6">
-            <div>
-              <label
-                htmlFor="story"
-                className="block text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2"
-              >
-                La Historia — ¿Qué hay detrás de esta obra?
-              </label>
-              <textarea
-                id="story"
-                value={story}
-                onChange={(e) => setStory(e.target.value)}
-                rows={4}
-                className="w-full border border-gallery-border bg-transparent p-3 text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 resize-none rounded"
-                placeholder="Cuenta la historia emocional: ¿qué momento captura esta pieza? ¿qué sentías al crearla?"
-              />
-            </div>
+            <Textarea
+              id="story"
+              label="La Historia — ¿Qué hay detrás de esta obra?"
+              value={story}
+              onChange={setStory}
+              placeholder="Cuenta la historia emocional: ¿qué momento captura esta pieza? ¿qué sentías al crearla?"
+              lang="es"
+            />
+            <Textarea
+              id="story_en"
+              label="The Story — What's behind this work?"
+              value={storyEn}
+              onChange={setStoryEn}
+              placeholder="Tell the emotional story in English..."
+              lang="en"
+            />
 
-            <div>
-              <label
-                htmlFor="inspiration"
-                className="block text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2"
-              >
-                Inspiración — ¿De dónde nació la idea?
-              </label>
-              <textarea
-                id="inspiration"
-                value={inspiration}
-                onChange={(e) => setInspiration(e.target.value)}
-                rows={3}
-                className="w-full border border-gallery-border bg-transparent p-3 text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 resize-none rounded"
-                placeholder="Un paseo al atardecer, una conversación, un recuerdo de la infancia..."
-              />
-            </div>
+            <Textarea
+              id="inspiration"
+              label="Inspiración — ¿De dónde nació la idea?"
+              value={inspiration}
+              onChange={setInspiration}
+              rows={3}
+              placeholder="Un paseo al atardecer, una conversación, un recuerdo de la infancia..."
+              lang="es"
+            />
+            <Textarea
+              id="inspiration_en"
+              label="Inspiration — Where did the idea come from?"
+              value={inspirationEn}
+              onChange={setInspirationEn}
+              rows={3}
+              placeholder="A sunset walk, a conversation, a childhood memory..."
+              lang="en"
+            />
           </div>
         </div>
       </div>
@@ -323,31 +389,49 @@ export default function ProductForm({ product }: ProductFormProps) {
             Unicidad de la pieza
           </h3>
           <p className="text-xs text-gallery-gray mb-5">
-            Estos datos aparecen en el certificado de unicidad visible en la
-            página del producto.
+            Estos datos aparecen en el certificado de unicidad visible en la página del producto.
           </p>
 
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <Input
                 id="edition"
-                label="Edición"
+                label="Edición — ES"
                 value={edition}
                 onChange={(e) => setEdition(e.target.value)}
                 placeholder="Pieza única — 1/1"
               />
               <Input
+                id="edition_en"
+                label="Edition — EN"
+                value={editionEn}
+                onChange={(e) => setEditionEn(e.target.value)}
+                placeholder="Unique piece — 1/1"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <Input
                 id="creationTime"
-                label="Tiempo de creación"
+                label="Tiempo de creación — ES"
                 value={creationTime}
                 onChange={(e) => setCreationTime(e.target.value)}
                 placeholder="Ej: 3 semanas"
               />
+              <Input
+                id="creationTime_en"
+                label="Creation time — EN"
+                value={creationTimeEn}
+                onChange={(e) => setCreationTimeEn(e.target.value)}
+                placeholder="E.g.: 3 weeks"
+              />
             </div>
 
+            {/* Unique traits ES */}
             <div>
-              <label className="block text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2">
-                Rasgos únicos — ¿Qué hace irrepetible esta pieza?
+              <label className="flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2">
+                Rasgos únicos — ES
+                <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-gallery-light text-gallery-gray">ES</span>
               </label>
               <div className="flex flex-wrap gap-2 mb-3">
                 {uniqueTraits.map((trait, i) => (
@@ -380,7 +464,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                     }
                   }}
                   className="flex-1 border border-gallery-border bg-transparent p-2.5 text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 rounded"
-                  placeholder="Ej: Textura con arena de playa, Pigmentos naturales..."
+                  placeholder="Ej: Textura con arena de playa..."
                 />
                 <button
                   type="button"
@@ -393,6 +477,60 @@ export default function ProductForm({ product }: ProductFormProps) {
                   className="px-4 py-2 border border-gallery-border text-gallery-black text-xs uppercase hover:border-gallery-black transition-colors rounded"
                 >
                   Añadir
+                </button>
+              </div>
+            </div>
+
+            {/* Unique traits EN */}
+            <div>
+              <label className="flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2">
+                Unique traits — EN
+                <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-blue-50 text-blue-500">EN</span>
+              </label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {uniqueTraitsEn.map((trait, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-3 py-1.5 rounded"
+                  >
+                    {trait}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setUniqueTraitsEn(uniqueTraitsEn.filter((_, idx) => idx !== i))
+                      }
+                      className="text-blue-400 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={newTraitEn}
+                  onChange={(e) => setNewTraitEn(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newTraitEn.trim()) {
+                      e.preventDefault();
+                      setUniqueTraitsEn([...uniqueTraitsEn, newTraitEn.trim()]);
+                      setNewTraitEn("");
+                    }
+                  }}
+                  className="flex-1 border border-gallery-border bg-transparent p-2.5 text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 rounded"
+                  placeholder="E.g.: Beach sand texture..."
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (newTraitEn.trim()) {
+                      setUniqueTraitsEn([...uniqueTraitsEn, newTraitEn.trim()]);
+                      setNewTraitEn("");
+                    }
+                  }}
+                  className="px-4 py-2 border border-gallery-border text-gallery-black text-xs uppercase hover:border-gallery-black transition-colors rounded"
+                >
+                  Add
                 </button>
               </div>
             </div>

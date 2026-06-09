@@ -22,7 +22,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const { name } = await req.json();
+    const { name, name_en } = await req.json();
     if (!name?.trim()) {
       return NextResponse.json(
         { success: false, error: "El nombre de categoría es requerido" },
@@ -32,7 +32,11 @@ export async function PUT(
 
     const category = await prisma.category.update({
       where: { id },
-      data: { name: name.trim(), slug: toSlug(name.trim()) },
+      data: {
+        name: name.trim(),
+        slug: toSlug(name.trim()),
+        name_en: name_en?.trim() ?? "",
+      },
     });
     return NextResponse.json({ success: true, data: category });
   } catch (err: unknown) {

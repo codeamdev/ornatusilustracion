@@ -20,6 +20,7 @@ model Admin {
 model Category {
   id        String    @id @default(uuid())
   name      String    @unique
+  name_en   String    @default("")
   slug      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -30,15 +31,22 @@ model Product {
   id           String      @id @default(uuid())
   name         String
   slug         String      @unique
-  description  String      @default("")
-  story        String      @default("")
-  inspiration  String      @default("")
-  materials    String      @default("")
-  dimensions   String      @default("")
-  year         Int?
-  edition      String      @default("Pieza única — 1/1")
-  creationTime String      @default("")
-  uniqueTraits String[]
+  description     String   @default("")
+  description_en  String   @default("")
+  story           String   @default("")
+  story_en        String   @default("")
+  inspiration     String   @default("")
+  inspiration_en  String   @default("")
+  materials       String   @default("")
+  materials_en    String   @default("")
+  dimensions      String   @default("")
+  year            Int?
+  edition         String   @default("Pieza única — 1/1")
+  edition_en      String   @default("")
+  creationTime    String   @default("")
+  creationTime_en String   @default("")
+  uniqueTraits    String[]
+  uniqueTraits_en String[]
   price        Float?
   images       String[]
   categoryId   String

@@ -16,6 +16,7 @@ export default function AdminCategoriesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(null);
   const [name, setName] = useState("");
+  const [nameEn, setNameEn] = useState("");
   const [saving, setSaving] = useState(false);
 
   function fetchCategories() {
@@ -35,12 +36,14 @@ export default function AdminCategoriesPage() {
   function openCreate() {
     setEditingCategory(null);
     setName("");
+    setNameEn("");
     setModalOpen(true);
   }
 
   function openEdit(cat: ICategory) {
     setEditingCategory(cat);
     setName(cat.name);
+    setNameEn(cat.name_en || "");
     setModalOpen(true);
   }
 
@@ -57,7 +60,7 @@ export default function AdminCategoriesPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim() }),
+        body: JSON.stringify({ name: name.trim(), name_en: nameEn.trim() }),
       });
       const data = await res.json();
 
@@ -161,11 +164,18 @@ export default function AdminCategoriesPage() {
         <div className="space-y-6">
           <Input
             id="cat-name"
-            label="Nombre"
+            label="Nombre — ES"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ej: Murales"
             autoFocus
+          />
+          <Input
+            id="cat-name-en"
+            label="Name — EN"
+            value={nameEn}
+            onChange={(e) => setNameEn(e.target.value)}
+            placeholder="E.g.: Murals"
           />
           <div className="flex gap-3">
             <Button onClick={handleSave} loading={saving}>

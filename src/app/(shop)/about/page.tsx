@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import FadeIn from "@/components/shop/FadeIn";
-import { useConfig } from "@/context/ConfigContext";
+import { useLocalizedConfig } from "@/hooks/useLocalizedConfig";
 import { useLocale } from "@/context/LocaleContext";
 
 export default function AboutPage() {
@@ -13,7 +13,7 @@ export default function AboutPage() {
     artist_bio_2,
     artist_process_1,
     artist_process_2,
-  } = useConfig();
+  } = useLocalizedConfig();
   const { t } = useLocale();
 
   return (
