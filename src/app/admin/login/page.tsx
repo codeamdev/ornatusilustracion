@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useToast } from "@/context/ToastContext";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,7 +29,7 @@ export default function AdminLoginPage() {
 
       if (data.success) {
         toast("Sesión iniciada");
-        router.push("/admin");
+        window.location.href = "/admin";
       } else {
         setError(data.error || "Credenciales inválidas");
       }
