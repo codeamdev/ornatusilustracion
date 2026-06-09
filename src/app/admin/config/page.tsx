@@ -21,7 +21,20 @@ type Section = {
   fields: Field[];
 };
 
-const PALETTES = [
+const CUSTOM_PALETTES_KEY = "ornatus_custom_palettes";
+
+type Palette = {
+  name: string;
+  accent: string;
+  black: string;
+  white: string;
+  gray: string;
+  light: string;
+  border: string;
+  custom?: boolean;
+};
+
+const PALETTES: Palette[] = [
   { name: "Tierra", accent: "#A67C52", black: "#1C1917", white: "#FAF8F4", gray: "#78716C", light: "#F0ECE5", border: "#DDD6CB" },
   { name: "Noir", accent: "#D4B483", black: "#111111", white: "#F8F8F8", gray: "#888888", light: "#EEEEEE", border: "#CCCCCC" },
   { name: "Bosque", accent: "#5C8A5C", black: "#1A2420", white: "#F4F8F4", gray: "#6B8068", light: "#E8F0E8", border: "#C5D5C5" },
@@ -253,6 +266,10 @@ export default function AdminConfigPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const [customPalettes, setCustomPalettes] = useState<Palette[]>([]);
+  const [showSavePalette, setShowSavePalette] = useState(false);
+  const [newPaletteName, setNewPaletteName] = useState("");
+
   const load = useCallback(async () => {
     try {
       const res = await fetch("/api/config");
@@ -268,6 +285,13 @@ export default function AdminConfigPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(CUSTOM_PALETTES_KEY);
+      if (stored) setCustomPalettes(JSON.parse(stored));
+    } catch {}
+  }, []);
 
   function handleChange(key: keyof SiteConfigMap, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -285,6 +309,33 @@ export default function AdminConfigPage() {
       color_border: p.border,
     }));
     setSaved(false);
+  }
+
+  function saveCustomPalette() {
+    const name = newPaletteName.trim();
+    if (!name) return;
+    const palette: Palette = {
+      name,
+      accent: values.color_accent,
+      black: values.color_black,
+      white: values.color_white,
+      gray: values.color_gray,
+      light: values.color_light,
+      border: values.color_border,
+      custom: true,
+    };
+    const updated = [...customPalettes.filter((p) => p.name !== name), palette];
+    setCustomPalettes(updated);
+    localStorage.setItem(CUSTOM_PALETTES_KEY, JSON.stringify(updated));
+    setNewPaletteName("");
+    setShowSavePalette(false);
+    toast("Paleta guardada");
+  }
+
+  function deleteCustomPalette(name: string) {
+    const updated = customPalettes.filter((p) => p.name !== name);
+    setCustomPalettes(updated);
+    localStorage.setItem(CUSTOM_PALETTES_KEY, JSON.stringify(updated));
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -362,11 +413,15 @@ export default function AdminConfigPage() {
     );
   }
 
-  const currentPalette = PALETTES.find(
+  const allPalettes = [...PALETTES, ...customPalettes];
+  const currentPalette = allPalettes.find(
     (p) =>
       p.accent === values.color_accent &&
       p.black === values.color_black &&
-      p.white === values.color_white
+      p.white === values.color_white &&
+      p.gray === values.color_gray &&
+      p.light === values.color_light &&
+      p.border === values.color_border
   );
 
   return (
@@ -398,38 +453,117 @@ export default function AdminConfigPage() {
         </div>
 
         {/* Palette picker */}
-        <div className="px-6 pt-5 pb-2">
-          <p className="text-xs font-medium text-gray-600 mb-3 tracking-wide uppercase">Paletas predefinidas</p>
-          <div className="grid grid-cols-5 gap-2">
-            {PALETTES.map((palette) => {
-              const isActive = currentPalette?.name === palette.name;
-              return (
-                <button
-                  key={palette.name}
-                  type="button"
-                  onClick={() => applyPalette(palette)}
-                  className={`group relative flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
-                    isActive
-                      ? "border-gray-800 shadow-sm"
-                      : "border-transparent hover:border-gray-300"
-                  }`}
-                >
-                  {/* Color swatches */}
-                  <div className="flex gap-0.5">
-                    <div className="w-4 h-6 rounded-l-sm" style={{ backgroundColor: palette.black }} />
-                    <div className="w-4 h-6" style={{ backgroundColor: palette.accent }} />
-                    <div className="w-4 h-6 rounded-r-sm" style={{ backgroundColor: palette.light }} />
-                  </div>
-                  <span className="text-[10px] text-gray-600 font-medium">{palette.name}</span>
-                  {isActive && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-800 text-white rounded-full flex items-center justify-center text-[8px]">
-                      ✓
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+        <div className="px-6 pt-5 pb-2 space-y-4">
+          {/* Built-in palettes */}
+          <div>
+            <p className="text-xs font-medium text-gray-600 mb-3 tracking-wide uppercase">Paletas predefinidas</p>
+            <div className="grid grid-cols-5 gap-2">
+              {PALETTES.map((palette) => {
+                const isActive = currentPalette?.name === palette.name;
+                return (
+                  <button
+                    key={palette.name}
+                    type="button"
+                    onClick={() => applyPalette(palette)}
+                    className={`group relative flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
+                      isActive ? "border-gray-800 shadow-sm" : "border-transparent hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex gap-0.5">
+                      <div className="w-4 h-6 rounded-l-sm" style={{ backgroundColor: palette.black }} />
+                      <div className="w-4 h-6" style={{ backgroundColor: palette.accent }} />
+                      <div className="w-4 h-6 rounded-r-sm" style={{ backgroundColor: palette.light }} />
+                    </div>
+                    <span className="text-[10px] text-gray-600 font-medium">{palette.name}</span>
+                    {isActive && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-800 text-white rounded-full flex items-center justify-center text-[8px]">✓</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
+          {/* Custom palettes */}
+          {customPalettes.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-3 tracking-wide uppercase">Mis paletas</p>
+              <div className="grid grid-cols-5 gap-2">
+                {customPalettes.map((palette) => {
+                  const isActive = currentPalette?.name === palette.name && currentPalette?.custom;
+                  return (
+                    <div key={palette.name} className="relative group/card">
+                      <button
+                        type="button"
+                        onClick={() => applyPalette(palette)}
+                        className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
+                          isActive ? "border-gray-800 shadow-sm" : "border-transparent hover:border-gray-300"
+                        }`}
+                      >
+                        <div className="flex gap-0.5">
+                          <div className="w-4 h-6 rounded-l-sm" style={{ backgroundColor: palette.black }} />
+                          <div className="w-4 h-6" style={{ backgroundColor: palette.accent }} />
+                          <div className="w-4 h-6 rounded-r-sm" style={{ backgroundColor: palette.light }} />
+                        </div>
+                        <span className="text-[10px] text-gray-600 font-medium truncate w-full text-center">{palette.name}</span>
+                        {isActive && (
+                          <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-800 text-white rounded-full flex items-center justify-center text-[8px]">✓</span>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCustomPalette(palette.name)}
+                        title="Eliminar paleta"
+                        className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 text-white rounded-full items-center justify-center text-[9px] hidden group-hover/card:flex"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Save current as palette */}
+          {showSavePalette ? (
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="text"
+                value={newPaletteName}
+                onChange={(e) => setNewPaletteName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); saveCustomPalette(); } if (e.key === "Escape") setShowSavePalette(false); }}
+                placeholder="Nombre de la paleta…"
+                autoFocus
+                maxLength={24}
+                className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
+              />
+              <button
+                type="button"
+                onClick={saveCustomPalette}
+                disabled={!newPaletteName.trim()}
+                className="px-3 py-1.5 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 disabled:opacity-40 transition-colors"
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowSavePalette(false); setNewPaletteName(""); }}
+                className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowSavePalette(true)}
+              className="text-xs text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-1.5 pt-1"
+            >
+              <span className="text-base leading-none">+</span>
+              Guardar colores actuales como nueva paleta
+            </button>
+          )}
         </div>
 
         {/* Individual color fields */}
