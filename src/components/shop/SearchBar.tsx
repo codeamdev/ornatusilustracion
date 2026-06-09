@@ -3,9 +3,10 @@
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-export default function SearchBar({ value, onChange }: SearchBarProps) {
+export default function SearchBar({ value, onChange, placeholder = "Buscar productos..." }: SearchBarProps) {
   return (
     <div className="relative">
       <svg
@@ -27,7 +28,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Buscar productos..."
+        placeholder={placeholder}
         className="w-full pl-7 pr-4 py-2.5 border-b border-gallery-border bg-transparent text-sm text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300"
       />
       {value && (

@@ -4,10 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useLocale } from "@/context/LocaleContext";
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, totalItems, isOpen, setIsOpen } =
     useCart();
+  const { t } = useLocale();
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +46,7 @@ export default function CartDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gallery-border">
           <h2 className="font-[family-name:var(--font-playfair)] text-lg">
-            Carrito ({totalItems})
+            {t("cart.title", { count: totalItems })}
           </h2>
           <button
             onClick={() => setIsOpen(false)}
@@ -64,12 +66,12 @@ export default function CartDrawer() {
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M3 6h18" stroke="currentColor" strokeWidth="1.5" />
               </svg>
-              <p className="text-gallery-gray text-sm mb-4">Tu carrito está vacío</p>
+              <p className="text-gallery-gray text-sm mb-4">{t("cart.emptyCartDrawer")}</p>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-xs tracking-[0.15em] uppercase text-gallery-black border-b border-gallery-border pb-0.5 hover:border-gallery-black transition-colors"
               >
-                Explorar colección
+                {t("cart.exploreCollectionBtn")}
               </button>
             </div>
           ) : (
@@ -143,7 +145,7 @@ export default function CartDrawer() {
           <div className="px-6 py-5 border-t border-gallery-border space-y-4">
             {hasPricedItems && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gallery-gray">Subtotal</span>
+                <span className="text-gallery-gray">{t("cart.subtotal")}</span>
                 <span className="font-medium text-gallery-black">
                   €{subtotal.toFixed(2)}
                 </span>
@@ -155,17 +157,17 @@ export default function CartDrawer() {
               onClick={() => setIsOpen(false)}
               className="block w-full text-center bg-gallery-accent text-white py-3.5 text-xs tracking-[0.2em] uppercase hover:bg-gallery-accent/85 transition-colors duration-300"
             >
-              Finalizar pedido
+              {t("cart.completeOrder")}
             </Link>
 
             <div className="flex items-center justify-center gap-4 text-[10px] tracking-[0.1em] uppercase text-gallery-gray">
               <span className="flex items-center gap-1">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
-                Envío seguro
+                {t("cart.secureShipping")}
               </span>
               <span className="flex items-center gap-1">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Pieza certificada
+                {t("cart.certifiedPiece")}
               </span>
             </div>
           </div>

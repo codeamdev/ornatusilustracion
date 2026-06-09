@@ -9,6 +9,8 @@ import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
+import { useLocale } from "@/context/LocaleContext";
+import { useConfig } from "@/context/ConfigContext";
 import type { IProduct, ICategory } from "@/types";
 
 function generateSerial(id: string, year: number | null): string {
@@ -22,6 +24,8 @@ export default function ProductDetailPage() {
   const slug = params.slug as string;
   const { addItem } = useCart();
   const { toast } = useToast();
+  const { t } = useLocale();
+  const { whatsapp_number } = useConfig();
 
   const [product, setProduct] = useState<IProduct | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -46,13 +50,13 @@ export default function ProductDetailPage() {
     return (
       <div className="pt-32 pb-24 px-6 text-center">
         <h1 className="font-[family-name:var(--font-playfair)] text-3xl mb-4">
-          Producto no encontrado
+          {t("product.notFound")}
         </h1>
         <Link
           href="/gallery"
           className="text-xs tracking-[0.2em] uppercase text-gallery-gray hover:text-gallery-black border-b border-gallery-border pb-1"
         >
-          Volver a la galería
+          {t("product.backToGallery")}
         </Link>
       </div>
     );
@@ -69,10 +73,13 @@ export default function ProductDetailPage() {
   const serial = generateSerial(product.id, product.year);
   const outOfStock = product.showStock && product.stock === 0;
 
+  const waNumber = whatsapp_number?.replace(/\D/g, "") || "34600000000";
+  const waText = `${t("product.whatsappText")} "${product.name}" (${serial})`;
+
   function handleAddToCart() {
     if (outOfStock) return;
     addItem(product!);
-    toast("Añadido al carrito");
+    toast(t("product.addedToCart"));
   }
 
   return (
@@ -87,7 +94,7 @@ export default function ProductDetailPage() {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            Galería
+            {t("product.gallery")}
           </Link>
         </FadeIn>
 
@@ -106,7 +113,7 @@ export default function ProductDetailPage() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gallery-gray">
-                  Sin imagen
+                  {t("product.noImage")}
                 </div>
               )}
 
@@ -145,7 +152,7 @@ export default function ProductDetailPage() {
             )}
           </FadeIn>
 
-          {/* Right: Purchase panel — sticky */}
+          {/* Right: Purchase panel */}
           <FadeIn delay={150} className="lg:col-span-5">
             <div className="lg:sticky lg:top-28 space-y-6">
               {categoryName && (
@@ -163,28 +170,32 @@ export default function ProductDetailPage() {
                   €{product.price.toFixed(2)}
                 </p>
               ) : (
-                <p className="text-sm text-gallery-gray italic">Precio a consultar</p>
+                <p className="text-sm text-gallery-gray italic">{t("product.priceOnRequest")}</p>
               )}
 
-              {/* Stock indicator — visible solo si showStock está activado */}
+              {/* Stock indicator */}
               {product.showStock && (
                 <div className="flex items-center gap-2">
                   {product.stock === 0 ? (
                     <>
                       <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
-                      <p className="text-sm text-red-600 font-medium">Sin stock disponible</p>
+                      <p className="text-sm text-red-600 font-medium">{t("product.outOfStock")}</p>
                     </>
                   ) : product.stock <= 2 ? (
                     <>
                       <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
                       <p className="text-sm text-amber-700 font-medium">
-                        Solo {product.stock} {product.stock === 1 ? "unidad disponible" : "unidades disponibles"}
+                        {product.stock === 1
+                          ? t("product.onlyUnit", { count: product.stock })
+                          : t("product.onlyUnits", { count: product.stock })}
                       </p>
                     </>
                   ) : (
                     <>
                       <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-                      <p className="text-sm text-green-700">{product.stock} unidades disponibles</p>
+                      <p className="text-sm text-green-700">
+                        {t("product.unitsAvailable", { count: product.stock })}
+                      </p>
                     </>
                   )}
                 </div>
@@ -201,25 +212,25 @@ export default function ProductDetailPage() {
                 <dl className="space-y-2.5 border-t border-gallery-border/50 pt-5">
                   {product.materials && (
                     <div className="flex justify-between text-sm">
-                      <dt className="text-gallery-gray">Técnica</dt>
+                      <dt className="text-gallery-gray">{t("product.technique")}</dt>
                       <dd className="text-gallery-black">{product.materials}</dd>
                     </div>
                   )}
                   {product.dimensions && (
                     <div className="flex justify-between text-sm">
-                      <dt className="text-gallery-gray">Dimensiones</dt>
+                      <dt className="text-gallery-gray">{t("product.dimensions")}</dt>
                       <dd className="text-gallery-black">{product.dimensions}</dd>
                     </div>
                   )}
                   {product.year && (
                     <div className="flex justify-between text-sm">
-                      <dt className="text-gallery-gray">Año</dt>
+                      <dt className="text-gallery-gray">{t("product.year")}</dt>
                       <dd className="text-gallery-black">{product.year}</dd>
                     </div>
                   )}
                   {product.creationTime && (
                     <div className="flex justify-between text-sm">
-                      <dt className="text-gallery-gray">Tiempo de creación</dt>
+                      <dt className="text-gallery-gray">{t("product.creationTime")}</dt>
                       <dd className="text-gallery-black">{product.creationTime}</dd>
                     </div>
                   )}
@@ -230,7 +241,7 @@ export default function ProductDetailPage() {
               {hasUniqueTraits && (
                 <div className="border-t border-gallery-border/50 pt-5">
                   <p className="text-[11px] tracking-[0.2em] uppercase text-gallery-gray mb-3">
-                    Lo que hace única esta pieza
+                    {t("product.whatMakesItUnique")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {product.uniqueTraits.map((trait, i) => (
@@ -256,16 +267,16 @@ export default function ProductDetailPage() {
                   onClick={handleAddToCart}
                   disabled={outOfStock}
                 >
-                  {outOfStock ? "Sin stock disponible" : "Añadir al carrito"}
+                  {outOfStock ? t("product.outOfStock") : t("product.addToCart")}
                 </Button>
 
                 <a
-                  href={`https://wa.me/34600000000?text=Hola, me interesa "${product.name}" (${serial})`}
+                  href={`https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full text-center py-3 border border-gallery-border text-gallery-gray text-xs tracking-[0.15em] uppercase hover:border-gallery-black hover:text-gallery-black transition-all duration-300"
                 >
-                  Consultar por WhatsApp
+                  {t("product.inquireWhatsApp")}
                 </a>
               </div>
 
@@ -273,19 +284,19 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
-                  Certificado firmado
+                  {t("product.signedCertificate")}
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="1" y="3" width="15" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M16 8h4l3 3v5a2 2 0 01-2 2h-1M6 21a2 2 0 100-4 2 2 0 000 4zM17 21a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                  Envío asegurado
+                  {t("product.secureShipping")}
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Hecho a mano
+                  {t("product.handmade")}
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-gallery-gray">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Nunca reproducida
+                  {t("product.neverReproduced")}
                 </div>
               </div>
             </div>
@@ -293,11 +304,10 @@ export default function ProductDetailPage() {
         </div>
       </section>
 
-      {/* ── Uniqueness Certificate ── */}
+      {/* ── Certificate ── */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
         <FadeIn>
           <div className="border border-gallery-border p-8 md:p-12 max-w-3xl mx-auto relative">
-            {/* Corner decorations */}
             <div className="absolute top-3 left-3 w-4 h-4 border-t border-l border-gallery-black/30" />
             <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-gallery-black/30" />
             <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-gallery-black/30" />
@@ -309,7 +319,7 @@ export default function ProductDetailPage() {
                 <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <p className="text-[10px] tracking-[0.4em] uppercase text-gallery-gray mb-2">
-                Certificado de Unicidad
+                {t("product.certificateOfUniqueness")}
               </p>
               <h2 className="font-[family-name:var(--font-playfair)] text-2xl md:text-3xl text-gallery-black">
                 {product.name}
@@ -319,7 +329,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-8 border-y border-gallery-border/50 py-6">
               <div>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                  Edición
+                  {t("product.edition")}
                 </p>
                 <p className="text-sm font-medium text-gallery-black">
                   {product.edition || "1/1"}
@@ -327,7 +337,7 @@ export default function ProductDetailPage() {
               </div>
               <div>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                  Referencia
+                  {t("product.reference")}
                 </p>
                 <p className="text-sm font-mono text-gallery-black">
                   {serial}
@@ -336,7 +346,7 @@ export default function ProductDetailPage() {
               {product.creationTime && (
                 <div>
                   <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                    Tiempo de creación
+                    {t("product.creationTime")}
                   </p>
                   <p className="text-sm font-medium text-gallery-black">
                     {product.creationTime}
@@ -345,7 +355,7 @@ export default function ProductDetailPage() {
               )}
               <div>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                  Año
+                  {t("product.year")}
                 </p>
                 <p className="text-sm font-medium text-gallery-black">
                   {product.year || new Date().getFullYear()}
@@ -353,11 +363,10 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Unique traits */}
             {hasUniqueTraits && (
               <div className="mb-8">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-gallery-gray text-center mb-4">
-                  Lo que hace irrepetible esta obra
+                  {t("product.whatMakesItUnrepeatable")}
                 </p>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
                   {product.uniqueTraits.map((trait, i) => (
@@ -397,7 +406,7 @@ export default function ProductDetailPage() {
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-8 h-px bg-gallery-black" />
                     <h2 className="text-xs tracking-[0.3em] uppercase text-gallery-gray">
-                      La Historia
+                      {t("product.theStory")}
                     </h2>
                   </div>
                   <p className="text-gallery-gray leading-[1.9] text-base whitespace-pre-line">
@@ -413,7 +422,7 @@ export default function ProductDetailPage() {
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-8 h-px bg-gallery-black" />
                     <h2 className="text-xs tracking-[0.3em] uppercase text-gallery-gray">
-                      Inspiración
+                      {t("product.inspiration")}
                     </h2>
                   </div>
                   <blockquote className="border-l-2 border-gallery-border pl-6">
@@ -433,7 +442,7 @@ export default function ProductDetailPage() {
         <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <Image
             src={product.images[1]}
-            alt={`${product.name} — detalle`}
+            alt={`${product.name}${t("product.imageDetail")}`}
             fill
             className="object-cover"
             sizes="100vw"
@@ -448,12 +457,10 @@ export default function ProductDetailPage() {
           <section className="bg-gallery-light py-20 md:py-28">
             <div className="max-w-2xl mx-auto px-6 md:px-12 text-center">
               <p className="font-[family-name:var(--font-playfair)] text-xl md:text-2xl leading-relaxed text-gallery-black/80 italic">
-                &ldquo;Cada pieza lleva un fragmento de lo que siento. No es solo un
-                objeto — es una conversación silenciosa entre mi mundo interior y el
-                tuyo.&rdquo;
+                &ldquo;{t("product.defaultQuote")}&rdquo;
               </p>
               <p className="mt-6 text-xs tracking-[0.3em] uppercase text-gallery-gray">
-                — La Artista
+                {t("product.theArtist")}
               </p>
             </div>
           </section>
@@ -467,7 +474,7 @@ export default function ProductDetailPage() {
             <div className="flex items-center gap-4 mb-10">
               <div className="w-8 h-px bg-gallery-black" />
               <h2 className="text-xs tracking-[0.3em] uppercase text-gallery-gray">
-                El Proceso
+                {t("product.theProcess")}
               </h2>
             </div>
           </FadeIn>
@@ -477,7 +484,7 @@ export default function ProductDetailPage() {
                 <div className="relative aspect-square bg-gallery-light overflow-hidden group">
                   <Image
                     src={img}
-                    alt={`${product.name} — proceso ${i + 1}`}
+                    alt={`${product.name} ${t("product.imageProcess", { n: i + 1 })}`}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 768px) 50vw, 33vw"
@@ -500,10 +507,10 @@ export default function ProductDetailPage() {
         <button
           onClick={handleAddToCart}
           disabled={outOfStock}
-          aria-label={outOfStock ? "Sin stock" : `Añadir ${product.name} al carrito`}
+          aria-label={outOfStock ? t("product.outOfStockBtn") : `${t("product.add")} ${product.name}`}
           className="flex-shrink-0 bg-gallery-accent text-white px-6 py-2.5 text-xs tracking-[0.15em] uppercase disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {outOfStock ? "Sin stock" : "Añadir"}
+          {outOfStock ? t("product.outOfStockBtn") : t("product.add")}
         </button>
       </div>
       <div className="h-16 lg:hidden" />

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
+import { useLocale } from "@/context/LocaleContext";
 import FadeIn from "@/components/shop/FadeIn";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -12,6 +13,7 @@ import Input from "@/components/ui/Input";
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalItems } = useCart();
   const { toast } = useToast();
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -54,12 +56,12 @@ export default function CartPage() {
       if (result.success) {
         setSubmitted(true);
         clearCart();
-        toast("Pedido enviado correctamente");
+        toast(t("cart.orderSent"));
       } else {
-        toast(result.error || "Error al enviar el pedido", "error");
+        toast(result.error || t("cart.errorSending"), "error");
       }
     } catch {
-      toast("Error al enviar el pedido", "error");
+      toast(t("cart.errorSending"), "error");
     } finally {
       setLoading(false);
     }
@@ -75,25 +77,27 @@ export default function CartPage() {
               <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <h1 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl mb-4">
-              ¡Pedido recibido!
+              {t("cart.orderReceived")}
             </h1>
             <p className="text-gallery-gray mb-3 max-w-md mx-auto">
-              Hemos recibido tu pedido. Te contactaremos en las próximas 24 horas para confirmar los detalles y organizar el envío.
+              {t("cart.orderReceivedDesc")}
             </p>
             <p className="text-xs text-gallery-gray mb-8">
-              Revisa tu email por si te escribimos.
+              {t("cart.checkEmail")}
             </p>
             <Link
               href="/gallery"
               className="inline-block px-8 py-3 bg-gallery-accent text-white text-xs tracking-[0.25em] uppercase hover:bg-gallery-accent/85 transition-all duration-500"
             >
-              Seguir explorando
+              {t("cart.keepExploring")}
             </Link>
           </div>
         </FadeIn>
       </section>
     );
   }
+
+  const pieceLabel = totalItems === 1 ? t("cart.piece") : t("cart.pieces");
 
   return (
     <section className="pt-32 md:pt-40 pb-24 md:pb-36 px-6 md:px-12 max-w-7xl mx-auto">
@@ -105,10 +109,10 @@ export default function CartPage() {
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Seguir comprando
+          {t("cart.continueShopping")}
         </Link>
         <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-gallery-black mb-12">
-          Tu Pedido ({totalItems})
+          {t("cart.yourOrder", { count: totalItems })}
         </h1>
       </FadeIn>
 
@@ -119,12 +123,12 @@ export default function CartPage() {
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" strokeWidth="1.5" />
               <path d="M3 6h18" stroke="currentColor" strokeWidth="1.5" />
             </svg>
-            <p className="text-gallery-gray mb-6">Tu carrito está vacío.</p>
+            <p className="text-gallery-gray mb-6">{t("cart.emptyCart")}</p>
             <Link
               href="/gallery"
               className="inline-block px-8 py-3 bg-gallery-accent text-white text-xs tracking-[0.25em] uppercase hover:bg-gallery-accent/85 transition-all duration-500"
             >
-              Explorar Colección
+              {t("cart.exploreCollection")}
             </Link>
           </div>
         </FadeIn>
@@ -164,7 +168,7 @@ export default function CartPage() {
                       </p>
                     ) : (
                       <p className="text-xs text-gallery-gray italic mt-1">
-                        Precio a consultar
+                        {t("cart.priceOnRequest")}
                       </p>
                     )}
                     <div className="flex items-center gap-3 mt-3">
@@ -186,7 +190,7 @@ export default function CartPage() {
                         onClick={() => removeItem(item.product.id)}
                         className="ml-4 text-xs tracking-[0.1em] uppercase text-gallery-gray hover:text-red-500 transition-colors"
                       >
-                        Eliminar
+                        {t("cart.remove")}
                       </button>
                     </div>
                   </div>
@@ -195,30 +199,30 @@ export default function CartPage() {
             </div>
           </FadeIn>
 
-          {/* Checkout sidebar — sticky */}
+          {/* Checkout sidebar */}
           <FadeIn delay={200}>
             <div className="lg:sticky lg:top-28">
               <div className="bg-gallery-light p-8 space-y-6">
                 <h2 className="font-[family-name:var(--font-playfair)] text-xl">
-                  Datos de contacto
+                  {t("cart.contactDetails")}
                 </h2>
                 <p className="text-xs text-gallery-gray -mt-3">
-                  Te contactaremos para confirmar el pedido y los detalles de envío.
+                  {t("cart.contactDetailsDesc")}
                 </p>
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <Input id="name" name="name" label="Nombre" placeholder="Tu nombre completo" required />
-                  <Input id="email" name="email" type="email" label="Email" placeholder="tu@email.com" required />
-                  <Input id="phone" name="phone" type="tel" label="Teléfono" placeholder="+34 600 000 000" required />
+                  <Input id="name" name="name" label={t("cart.name")} placeholder={t("cart.namePlaceholder")} required />
+                  <Input id="email" name="email" type="email" label={t("cart.email")} placeholder={t("cart.emailPlaceholder")} required />
+                  <Input id="phone" name="phone" type="tel" label={t("cart.phone")} placeholder={t("cart.phonePlaceholder")} required />
                   <div>
                     <label htmlFor="message" className="block text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2">
-                      Nota (opcional)
+                      {t("cart.note")}
                     </label>
                     <textarea
                       id="message"
                       name="message"
                       rows={2}
                       className="w-full border-b border-gallery-border bg-transparent py-2.5 text-gallery-black placeholder:text-gallery-gray/50 focus:outline-none focus:border-gallery-black transition-colors duration-300 resize-none text-sm"
-                      placeholder="Alguna indicación especial..."
+                      placeholder={t("cart.notePlaceholder")}
                     />
                   </div>
 
@@ -226,43 +230,43 @@ export default function CartPage() {
                   <div className="border-t border-gallery-border pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gallery-gray">
-                        {totalItems} {totalItems === 1 ? "pieza" : "piezas"}
+                        {totalItems} {pieceLabel}
                       </span>
                       {hasPricedItems && (
                         <span className="text-gallery-black">€{subtotal.toFixed(2)}</span>
                       )}
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gallery-gray">Envío</span>
-                      <span className="text-gallery-gray text-xs italic">A confirmar</span>
+                      <span className="text-gallery-gray">{t("cart.shipping")}</span>
+                      <span className="text-gallery-gray text-xs italic">{t("cart.toConfirm")}</span>
                     </div>
                     {hasPricedItems && (
                       <div className="flex justify-between text-base font-medium pt-2 border-t border-gallery-border/50">
-                        <span>Total estimado</span>
+                        <span>{t("cart.estimatedTotal")}</span>
                         <span>€{subtotal.toFixed(2)}</span>
                       </div>
                     )}
                   </div>
 
                   <Button type="submit" loading={loading} className="w-full" size="lg">
-                    Enviar Pedido
+                    {t("cart.sendOrder")}
                   </Button>
                 </form>
               </div>
 
-              {/* Trust signals below form */}
+              {/* Trust signals */}
               <div className="mt-5 space-y-3">
                 <div className="flex items-start gap-3 text-xs text-gallery-gray">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="mt-0.5 flex-shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
-                  <span>Cada pieza incluye certificado de autenticidad firmado por la artista.</span>
+                  <span>{t("cart.certificateNote")}</span>
                 </div>
                 <div className="flex items-start gap-3 text-xs text-gallery-gray">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="mt-0.5 flex-shrink-0"><rect x="1" y="3" width="15" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M16 8h4l3 3v5a2 2 0 01-2 2h-1M6 21a2 2 0 100-4 2 2 0 000 4zM17 21a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                  <span>Envío asegurado con embalaje profesional para proteger tu obra.</span>
+                  <span>{t("cart.shippingNote")}</span>
                 </div>
                 <div className="flex items-start gap-3 text-xs text-gallery-gray">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="mt-0.5 flex-shrink-0"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  <span>Te contactaremos personalmente para confirmar todo antes de enviar.</span>
+                  <span>{t("cart.contactNote")}</span>
                 </div>
               </div>
             </div>

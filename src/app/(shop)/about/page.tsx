@@ -3,6 +3,7 @@
 import Image from "next/image";
 import FadeIn from "@/components/shop/FadeIn";
 import { useConfig } from "@/context/ConfigContext";
+import { useLocale } from "@/context/LocaleContext";
 
 export default function AboutPage() {
   const {
@@ -13,12 +14,13 @@ export default function AboutPage() {
     artist_process_1,
     artist_process_2,
   } = useConfig();
+  const { t } = useLocale();
 
   return (
     <section className="pt-32 md:pt-40 pb-24 md:pb-36 px-6 md:px-12 max-w-7xl mx-auto">
       <FadeIn>
         <p className="text-xs tracking-[0.3em] uppercase text-gallery-gray mb-3">
-          Sobre mí
+          {t("about.label")}
         </p>
         <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-gallery-black mb-16 md:mb-20">
           {artist_name}
@@ -30,7 +32,7 @@ export default function AboutPage() {
           <div className="relative aspect-[3/4] bg-gallery-light overflow-hidden">
             <Image
               src={artist_portrait_url || "/artist-portrait.jpg"}
-              alt={`Retrato de ${artist_name}`}
+              alt={t("about.portrait", { name: artist_name })}
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -42,7 +44,7 @@ export default function AboutPage() {
           <div className="space-y-8">
             <div>
               <h2 className="font-[family-name:var(--font-playfair)] text-2xl md:text-3xl text-gallery-black mb-6">
-                Biografía
+                {t("about.biography")}
               </h2>
               <div className="space-y-5 text-gallery-gray leading-relaxed">
                 {artist_bio_1 && <p>{artist_bio_1}</p>}
@@ -52,7 +54,7 @@ export default function AboutPage() {
 
             <div className="pt-8 border-t border-gallery-border">
               <h2 className="font-[family-name:var(--font-playfair)] text-2xl md:text-3xl text-gallery-black mb-6">
-                Mi Proceso
+                {t("about.myProcess")}
               </h2>
               <div className="space-y-5 text-gallery-gray leading-relaxed">
                 {artist_process_1 && <p>{artist_process_1}</p>}

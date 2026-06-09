@@ -1,5 +1,6 @@
 import { CartProvider } from "@/context/CartContext";
 import { ConfigProvider } from "@/context/ConfigContext";
+import { LocaleProvider } from "@/context/LocaleContext";
 import Navbar from "@/components/shop/Navbar";
 import Footer from "@/components/shop/Footer";
 import CartDrawer from "@/components/shop/CartDrawer";
@@ -25,6 +26,7 @@ export default async function ShopLayout({
   const config = await getSiteConfig();
 
   return (
+    <LocaleProvider>
     <ConfigProvider config={config}>
       <CartProvider>
         <Navbar />
@@ -35,5 +37,6 @@ export default async function ShopLayout({
         <ThemeInjector />
       </CartProvider>
     </ConfigProvider>
+    </LocaleProvider>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useConfig } from "@/context/ConfigContext";
+import { useLocale } from "@/context/LocaleContext";
 
 export default function Footer() {
   const {
@@ -13,6 +14,7 @@ export default function Footer() {
     facebook_url,
     tiktok_url,
   } = useConfig();
+  const { t } = useLocale();
 
   const socials = [
     { label: "Instagram", href: instagram_url },
@@ -25,22 +27,35 @@ export default function Footer() {
     { label: contact_email, href: contact_email ? `mailto:${contact_email}` : "" },
   ].filter((s) => s.href);
 
+  const navLinks = [
+    { href: "/gallery", label: t("nav.gallery") },
+    { href: "/about", label: t("nav.about") },
+    { href: "/contact", label: t("nav.contact") },
+    { href: "/cart", label: t("footer.myOrder") },
+  ];
+
   return (
     <footer className="border-t border-gallery-border/50">
       {/* Trust strip */}
       <div className="py-8 px-6 md:px-12 border-b border-gallery-border/50">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
           <div>
-            <p className="text-xs tracking-[0.2em] uppercase text-gallery-black mb-1">Piezas Únicas</p>
-            <p className="text-xs text-gallery-gray">Cada obra es irrepetible, hecha a mano con certificado de autenticidad.</p>
+            <p className="text-xs tracking-[0.2em] uppercase text-gallery-black mb-1">
+              {t("footer.uniquePieces")}
+            </p>
+            <p className="text-xs text-gallery-gray">{t("footer.uniquePiecesDesc")}</p>
           </div>
           <div>
-            <p className="text-xs tracking-[0.2em] uppercase text-gallery-black mb-1">Envío Asegurado</p>
-            <p className="text-xs text-gallery-gray">Embalaje profesional y envío con seguro para que tu pieza llegue perfecta.</p>
+            <p className="text-xs tracking-[0.2em] uppercase text-gallery-black mb-1">
+              {t("footer.secureShipping")}
+            </p>
+            <p className="text-xs text-gallery-gray">{t("footer.secureShippingDesc")}</p>
           </div>
           <div>
-            <p className="text-xs tracking-[0.2em] uppercase text-gallery-black mb-1">Atención Personal</p>
-            <p className="text-xs text-gallery-gray">Trato directo con la artista. Encargos personalizados disponibles.</p>
+            <p className="text-xs tracking-[0.2em] uppercase text-gallery-black mb-1">
+              {t("footer.personalAttention")}
+            </p>
+            <p className="text-xs text-gallery-gray">{t("footer.personalAttentionDesc")}</p>
           </div>
         </div>
       </div>
@@ -61,16 +76,16 @@ export default function Footer() {
 
             {/* Nav links */}
             <div>
-              <h4 className="text-xs tracking-[0.2em] uppercase text-gallery-gray mb-4">Navegación</h4>
+              <h4 className="text-xs tracking-[0.2em] uppercase text-gallery-gray mb-4">
+                {t("footer.navigation")}
+              </h4>
               <ul className="space-y-2">
-                {[
-                  { href: "/gallery", label: "Galería" },
-                  { href: "/about", label: "Sobre mí" },
-                  { href: "/contact", label: "Contacto" },
-                  { href: "/cart", label: "Mi pedido" },
-                ].map(({ href, label }) => (
+                {navLinks.map(({ href, label }) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-gallery-gray hover:text-gallery-black transition-colors duration-300">
+                    <Link
+                      href={href}
+                      className="text-sm text-gallery-gray hover:text-gallery-black transition-colors duration-300"
+                    >
                       {label}
                     </Link>
                   </li>
@@ -81,7 +96,9 @@ export default function Footer() {
             {/* Social / contact */}
             {socials.length > 0 && (
               <div>
-                <h4 className="text-xs tracking-[0.2em] uppercase text-gallery-gray mb-4">Conecta</h4>
+                <h4 className="text-xs tracking-[0.2em] uppercase text-gallery-gray mb-4">
+                  {t("footer.connect")}
+                </h4>
                 <ul className="space-y-2">
                   {socials.map(({ label, href }) => (
                     <li key={label}>
@@ -102,7 +119,7 @@ export default function Footer() {
 
           <div className="border-t border-gallery-border/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-2 text-xs tracking-widest uppercase text-gallery-gray">
             <span>&copy; {new Date().getFullYear()} {site_name}</span>
-            <span>Todos los derechos reservados</span>
+            <span>{t("footer.allRightsReserved")}</span>
           </div>
         </div>
       </div>

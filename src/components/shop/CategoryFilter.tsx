@@ -6,12 +6,14 @@ interface CategoryFilterProps {
   categories: ICategory[];
   selected: string | null;
   onSelect: (id: string | null) => void;
+  allLabel?: string;
 }
 
 export default function CategoryFilter({
   categories,
   selected,
   onSelect,
+  allLabel = "Todos",
 }: CategoryFilterProps) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -23,7 +25,7 @@ export default function CategoryFilter({
             : "bg-transparent text-gallery-gray border-gallery-border hover:border-gallery-black hover:text-gallery-black"
         }`}
       >
-        Todos
+        {allLabel}
       </button>
       {categories.map((cat) => (
         <button

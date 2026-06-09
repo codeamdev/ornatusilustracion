@@ -6,6 +6,7 @@ import ProductGrid from "@/components/shop/ProductGrid";
 import CategoryFilter from "@/components/shop/CategoryFilter";
 import SearchBar from "@/components/shop/SearchBar";
 import Spinner from "@/components/ui/Spinner";
+import { useLocale } from "@/context/LocaleContext";
 import type { IProduct, ICategory } from "@/types";
 
 export default function GalleryPage() {
@@ -14,6 +15,7 @@ export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const { t } = useLocale();
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -50,17 +52,20 @@ export default function GalleryPage() {
     ? categories.find((c) => c.id === selectedCategory)?.name
     : null;
 
+  const count = products.length;
+  const pieceLabel = count === 1 ? t("gallery.piece") : t("gallery.pieces");
+
   return (
     <section className="pt-32 md:pt-40 pb-24 md:pb-36 px-6 md:px-12 max-w-7xl mx-auto">
       <FadeIn>
         <p className="text-xs tracking-[0.3em] uppercase text-gallery-gray mb-3">
-          Colección
+          {t("gallery.collection")}
         </p>
         <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-gallery-black mb-4">
-          {selectedCategoryName || "Galería"}
+          {selectedCategoryName || t("gallery.galleryTitle")}
         </h1>
         <p className="text-sm text-gallery-gray mb-10 max-w-lg">
-          Piezas únicas hechas a mano. Cada obra incluye certificado de autenticidad y envío asegurado.
+          {t("gallery.subtitle")}
         </p>
       </FadeIn>
 
@@ -71,9 +76,14 @@ export default function GalleryPage() {
             categories={categories}
             selected={selectedCategory}
             onSelect={setSelectedCategory}
+            allLabel={t("gallery.all")}
           />
           <div className="w-full sm:w-64">
-            <SearchBar value={search} onChange={setSearch} />
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+              placeholder={t("gallery.search")}
+            />
           </div>
         </div>
       </FadeIn>
@@ -81,9 +91,9 @@ export default function GalleryPage() {
       {/* Results count */}
       {!loading && (
         <p className="text-xs text-gallery-gray mb-8">
-          {products.length} {products.length === 1 ? "pieza" : "piezas"}
-          {selectedCategoryName ? ` en ${selectedCategoryName}` : ""}
-          {search ? ` para "${search}"` : ""}
+          {count} {pieceLabel}
+          {selectedCategoryName ? ` ${t("gallery.inCategory")} ${selectedCategoryName}` : ""}
+          {search ? ` ${t("gallery.resultsFor")} "${search}"` : ""}
         </p>
       )}
 
