@@ -28,7 +28,7 @@ export default function AboutPage() {
       </FadeIn>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
-        <FadeIn>
+        <FadeIn className="lg:sticky lg:top-28">
           <div className="relative aspect-[3/4] bg-gallery-light overflow-hidden">
             <Image
               src={artist_portrait_url || "/artist-portrait.jpg"}
