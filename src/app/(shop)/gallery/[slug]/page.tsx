@@ -115,14 +115,6 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Species badge */}
-              {product.species && (
-                <div className="absolute top-4 left-4">
-                  <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-3 py-1.5">
-                    {product.species}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Thumbnails */}
