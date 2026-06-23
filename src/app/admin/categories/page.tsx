@@ -17,6 +17,7 @@ export default function AdminCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<ICategory | null>(null);
   const [name, setName] = useState("");
   const [nameEn, setNameEn] = useState("");
+  const [parentId, setParentId] = useState<string>("");
   const [saving, setSaving] = useState(false);
 
   function fetchCategories() {
@@ -33,10 +34,11 @@ export default function AdminCategoriesPage() {
     fetchCategories();
   }, []);
 
-  function openCreate() {
+  function openCreate(defaultParentId = "") {
     setEditingCategory(null);
     setName("");
     setNameEn("");
+    setParentId(defaultParentId);
     setModalOpen(true);
   }
 
@@ -44,6 +46,7 @@ export default function AdminCategoriesPage() {
     setEditingCategory(cat);
     setName(cat.name);
     setNameEn(cat.name_en || "");
+    setParentId(cat.parentId || "");
     setModalOpen(true);
   }
 
@@ -60,7 +63,7 @@ export default function AdminCategoriesPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), name_en: nameEn.trim() }),
+        body: JSON.stringify({ name: name.trim(), name_en: nameEn.trim(), parentId: parentId || null }),
       });
       const data = await res.json();
 
@@ -79,7 +82,7 @@ export default function AdminCategoriesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("¿Eliminar esta categoría?")) return;
+    if (!confirm("¿Eliminar esta categoría? Las subcategorías también serán eliminadas.")) return;
 
     const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
     const data = await res.json();
@@ -92,13 +95,16 @@ export default function AdminCategoriesPage() {
     }
   }
 
+  // Only top-level for parent selector
+  const rootCategories = categories.filter((c) => !c.parentId);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-[family-name:var(--font-playfair)] text-2xl text-gallery-black">
           Categorías
         </h1>
-        <Button size="sm" onClick={openCreate}>
+        <Button size="sm" onClick={() => openCreate()}>
           + Nueva
         </Button>
       </div>
@@ -108,7 +114,7 @@ export default function AdminCategoriesPage() {
       ) : categories.length === 0 ? (
         <div className="bg-white p-10 rounded shadow-sm text-center">
           <p className="text-gallery-gray mb-4">No hay categorías.</p>
-          <Button size="sm" onClick={openCreate}>
+          <Button size="sm" onClick={() => openCreate()}>
             Crear primera categoría
           </Button>
         </div>
@@ -123,32 +129,65 @@ export default function AdminCategoriesPage() {
               </tr>
             </thead>
             <tbody>
-              {categories.map((cat) => (
-                <tr
-                  key={cat.id}
-                  className="border-b border-gallery-border/50 hover:bg-gallery-light/50 transition-colors"
-                >
-                  <td className="p-4 text-sm font-medium">{cat.name}</td>
-                  <td className="p-4 hidden sm:table-cell text-sm text-gallery-gray">
-                    {cat.slug}
-                  </td>
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => openEdit(cat)}
-                        className="text-xs text-gallery-gray hover:text-gallery-black transition-colors"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(cat.id)}
-                        className="text-xs text-gallery-gray hover:text-red-500 transition-colors"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              {rootCategories.map((cat) => (
+                <>
+                  <tr
+                    key={cat.id}
+                    className="border-b border-gallery-border/50 bg-gallery-light/30"
+                  >
+                    <td className="p-4 text-sm font-semibold text-gallery-black">{cat.name}</td>
+                    <td className="p-4 hidden sm:table-cell text-sm text-gallery-gray">{cat.slug}</td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => openCreate(cat.id)}
+                          className="text-xs text-gallery-accent hover:text-gallery-black transition-colors"
+                        >
+                          + Sub
+                        </button>
+                        <button
+                          onClick={() => openEdit(cat)}
+                          className="text-xs text-gallery-gray hover:text-gallery-black transition-colors"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cat.id)}
+                          className="text-xs text-gallery-gray hover:text-red-500 transition-colors"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {(cat.children ?? []).map((sub) => (
+                    <tr
+                      key={sub.id}
+                      className="border-b border-gallery-border/50 hover:bg-gallery-light/50 transition-colors"
+                    >
+                      <td className="pl-8 pr-4 py-3 text-sm text-gallery-black">
+                        <span className="text-gallery-gray mr-2">↳</span>{sub.name}
+                      </td>
+                      <td className="p-4 hidden sm:table-cell text-sm text-gallery-gray">{sub.slug}</td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openEdit(sub)}
+                            className="text-xs text-gallery-gray hover:text-gallery-black transition-colors"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleDelete(sub.id)}
+                            className="text-xs text-gallery-gray hover:text-red-500 transition-colors"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </>
               ))}
             </tbody>
           </table>
@@ -161,7 +200,7 @@ export default function AdminCategoriesPage() {
         onClose={() => setModalOpen(false)}
         title={editingCategory ? "Editar Categoría" : "Nueva Categoría"}
       >
-        <div className="space-y-6">
+        <div className="space-y-5">
           <Input
             id="cat-name"
             label="Nombre — ES"
@@ -177,6 +216,23 @@ export default function AdminCategoriesPage() {
             onChange={(e) => setNameEn(e.target.value)}
             placeholder="E.g.: Murals"
           />
+          <div>
+            <label className="block text-xs tracking-[0.15em] uppercase text-gallery-gray mb-2">
+              Categoría padre (opcional)
+            </label>
+            <select
+              value={parentId}
+              onChange={(e) => setParentId(e.target.value)}
+              className="w-full border border-gallery-border bg-transparent p-2.5 text-sm text-gallery-black focus:outline-none focus:border-gallery-black rounded transition-colors"
+            >
+              <option value="">— Categoría raíz —</option>
+              {rootCategories
+                .filter((c) => c.id !== editingCategory?.id)
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+            </select>
+          </div>
           <div className="flex gap-3">
             <Button onClick={handleSave} loading={saving}>
               {editingCategory ? "Guardar" : "Crear"}

@@ -12,13 +12,9 @@ import { useToast } from "@/context/ToastContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useConfig } from "@/context/ConfigContext";
 import { localizeProduct } from "@/lib/localize-product";
+import { formatCOP } from "@/lib/format-price";
 import type { IProduct, ICategory } from "@/types";
 
-function generateSerial(id: string, year: number | null): string {
-  const y = year || new Date().getFullYear();
-  const hash = id.slice(-6).toUpperCase();
-  return `ORN-${y}-${hash}`;
-}
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -73,11 +69,10 @@ export default function ProductDetailPage() {
   const hasStory = p.story || p.inspiration;
   const hasDetails = p.materials || product.dimensions || product.year;
   const hasUniqueTraits = p.uniqueTraits && p.uniqueTraits.length > 0;
-  const serial = generateSerial(product.id, product.year);
   const outOfStock = product.showStock && product.stock === 0;
 
   const waNumber = whatsapp_number?.replace(/\D/g, "") || "34600000000";
-  const waText = `${t("product.whatsappText")} "${product.name}" (${serial})`;
+  const waText = `${t("product.whatsappText")} "${product.name}"`;
 
   function handleAddToCart() {
     if (outOfStock) return;
@@ -120,19 +115,14 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Edition badge */}
-              <div className="absolute top-4 left-4">
-                <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-3 py-1.5">
-                  {p.edition || "Pieza única — 1/1"}
-                </span>
-              </div>
-
-              {/* Serial watermark */}
-              <div className="absolute bottom-4 right-4">
-                <span className="bg-gallery-black/60 backdrop-blur-sm text-white/70 text-[9px] tracking-[0.2em] font-mono px-2.5 py-1">
-                  {serial}
-                </span>
-              </div>
+              {/* Species badge */}
+              {product.species && (
+                <div className="absolute top-4 left-4">
+                  <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-3 py-1.5">
+                    {product.species}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Thumbnails */}
@@ -158,9 +148,9 @@ export default function ProductDetailPage() {
           {/* Right: Purchase panel */}
           <FadeIn delay={150} className="lg:col-span-5">
             <div className="lg:sticky lg:top-28 space-y-6">
-              {categoryName && (
+              {(categoryName || product.species) && (
                 <p className="text-[11px] tracking-[0.3em] uppercase text-gallery-gray">
-                  {categoryName}
+                  {[product.species, categoryName].filter(Boolean).join(" · ")}
                 </p>
               )}
 
@@ -170,7 +160,7 @@ export default function ProductDetailPage() {
 
               {product.price != null ? (
                 <p className="text-2xl font-light text-gallery-black">
-                  €{product.price.toFixed(2)}
+                  {formatCOP(product.price)}
                 </p>
               ) : (
                 <p className="text-sm text-gallery-gray italic">{t("product.priceOnRequest")}</p>
@@ -307,98 +297,6 @@ export default function ProductDetailPage() {
         </div>
       </section>
 
-      {/* ── Certificate ── */}
-      <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
-        <FadeIn>
-          <div className="border border-gallery-border p-8 md:p-12 max-w-3xl mx-auto relative">
-            <div className="absolute top-3 left-3 w-4 h-4 border-t border-l border-gallery-black/30" />
-            <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-gallery-black/30" />
-            <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-gallery-black/30" />
-            <div className="absolute bottom-3 right-3 w-4 h-4 border-b border-r border-gallery-black/30" />
-
-            <div className="text-center mb-8">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 text-gallery-black/60">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-gallery-gray mb-2">
-                {t("product.certificateOfUniqueness")}
-              </p>
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl md:text-3xl text-gallery-black">
-                {product.name}
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mb-8 border-y border-gallery-border/50 py-6">
-              <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                  {t("product.edition")}
-                </p>
-                <p className="text-sm font-medium text-gallery-black">
-                  {p.edition || "1/1"}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                  {t("product.reference")}
-                </p>
-                <p className="text-sm font-mono text-gallery-black">
-                  {serial}
-                </p>
-              </div>
-              {p.creationTime && (
-                <div>
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                    {t("product.creationTime")}
-                  </p>
-                  <p className="text-sm font-medium text-gallery-black">
-                    {p.creationTime}
-                  </p>
-                </div>
-              )}
-              <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-gallery-gray mb-1">
-                  {t("product.year")}
-                </p>
-                <p className="text-sm font-medium text-gallery-black">
-                  {product.year || new Date().getFullYear()}
-                </p>
-              </div>
-            </div>
-
-            {hasUniqueTraits && (
-              <div className="mb-8">
-                <p className="text-[10px] tracking-[0.3em] uppercase text-gallery-gray text-center mb-4">
-                  {t("product.whatMakesItUnrepeatable")}
-                </p>
-                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-                  {p.uniqueTraits.map((trait, i) => (
-                    <span key={i} className="flex items-center gap-2 text-sm text-gallery-black">
-                      <span className="w-1 h-1 rounded-full bg-gallery-black/40" />
-                      {trait}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {p.materials && (
-              <p className="text-center text-xs text-gallery-gray">
-                {p.materials}
-                {product.dimensions ? ` — ${product.dimensions}` : ""}
-              </p>
-            )}
-
-            <div className="text-center mt-8">
-              <p className="font-[family-name:var(--font-playfair)] text-lg italic text-gallery-black/60">
-                Ornatus
-              </p>
-              <div className="w-16 h-px bg-gallery-border mx-auto mt-2" />
-            </div>
-          </div>
-        </FadeIn>
-      </section>
-
       {/* ── Storytelling ── */}
       {hasStory && (
         <section className="max-w-7xl mx-auto px-6 md:px-12 pb-20 md:pb-28">
@@ -504,7 +402,7 @@ export default function ProductDetailPage() {
         <div className="min-w-0">
           <p className="text-sm font-medium text-gallery-black truncate">{product.name}</p>
           {product.price != null && (
-            <p className="text-xs text-gallery-gray">€{product.price.toFixed(2)}</p>
+            <p className="text-xs text-gallery-gray">{formatCOP(product.price)}</p>
           )}
         </div>
         <button

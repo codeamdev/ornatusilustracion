@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       data: {
         name: body.name,
         slug,
+        species: body.species ?? "",
         description: body.description ?? "",
         description_en: body.description_en ?? "",
         story: body.story ?? "",

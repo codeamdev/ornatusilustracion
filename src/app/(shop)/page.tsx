@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import FadeIn from "@/components/shop/FadeIn";
 import ProductGrid from "@/components/shop/ProductGrid";
+import HeroBackground from "@/components/shop/HeroBackground";
 import Spinner from "@/components/ui/Spinner";
 import { useLocalizedConfig } from "@/hooks/useLocalizedConfig";
 import { useLocale } from "@/context/LocaleContext";
@@ -17,6 +17,10 @@ export default function Home() {
     hero_title,
     hero_subtitle,
     hero_image_url,
+    hero_video_desktop,
+    hero_video_mobile,
+    hero_images_desktop,
+    hero_images_mobile,
     hero_cta_primary,
     hero_cta_secondary,
     statement_quote,
@@ -36,20 +40,21 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  const heroImage = hero_image_url || featured[0]?.images[0] || "/placeholder-hero.jpg";
+  const fallbackImage = hero_image_url || featured[0]?.images[0] || "";
+  const desktopImages = hero_images_desktop ? hero_images_desktop.split(",").map((s) => s.trim()).filter(Boolean) : [];
+  const mobileImages = hero_images_mobile ? hero_images_mobile.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
   return (
     <>
       {/* ── Hero ── */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <Image
-          src={heroImage}
-          alt="Ornatus Gallery"
-          fill
-          priority
-          className="object-cover"
+        <HeroBackground
+          videoDesktop={hero_video_desktop}
+          videoMobile={hero_video_mobile}
+          imagesDesktop={desktopImages}
+          imagesMobile={mobileImages}
+          fallbackImage={fallbackImage}
         />
-        <div className="absolute inset-0 bg-gallery-black/50" />
 
         <div className="relative z-10 text-center px-6 max-w-3xl">
           <h1 className="animate-fade-in-up font-[family-name:var(--font-playfair)] text-4xl sm:text-5xl md:text-7xl text-white leading-tight">

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
+import { formatCOP } from "@/lib/format-price";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
@@ -164,7 +165,7 @@ export default function CartPage() {
                     </Link>
                     {item.product.price != null ? (
                       <p className="text-sm text-gallery-black mt-1">
-                        €{item.product.price.toFixed(2)}
+                        {formatCOP(item.product.price)}
                       </p>
                     ) : (
                       <p className="text-xs text-gallery-gray italic mt-1">
@@ -233,7 +234,7 @@ export default function CartPage() {
                         {totalItems} {pieceLabel}
                       </span>
                       {hasPricedItems && (
-                        <span className="text-gallery-black">€{subtotal.toFixed(2)}</span>
+                        <span className="text-gallery-black">{formatCOP(subtotal)}</span>
                       )}
                     </div>
                     <div className="flex justify-between text-sm">
@@ -243,7 +244,7 @@ export default function CartPage() {
                     {hasPricedItems && (
                       <div className="flex justify-between text-base font-medium pt-2 border-t border-gallery-border/50">
                         <span>{t("cart.estimatedTotal")}</span>
-                        <span>€{subtotal.toFixed(2)}</span>
+                        <span>{formatCOP(subtotal)}</span>
                       </div>
                     )}
                   </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { formatCOP } from "@/lib/format-price";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useCart } from "@/context/CartContext";
@@ -105,7 +106,7 @@ export default function CartDrawer() {
                     </h4>
                     {item.product.price != null && (
                       <p className="text-xs text-gallery-gray mt-0.5">
-                        €{item.product.price.toFixed(2)}
+                        {formatCOP(item.product.price)}
                       </p>
                     )}
 
@@ -147,7 +148,7 @@ export default function CartDrawer() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gallery-gray">{t("cart.subtotal")}</span>
                 <span className="font-medium text-gallery-black">
-                  €{subtotal.toFixed(2)}
+                  {formatCOP(subtotal)}
                 </span>
               </div>
             )}

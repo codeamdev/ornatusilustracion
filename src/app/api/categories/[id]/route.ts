@@ -22,7 +22,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const { name, name_en } = await req.json();
+    const { name, name_en, parentId } = await req.json();
     if (!name?.trim()) {
       return NextResponse.json(
         { success: false, error: "El nombre de categoría es requerido" },
@@ -36,7 +36,9 @@ export async function PUT(
         name: name.trim(),
         slug: toSlug(name.trim()),
         name_en: name_en?.trim() ?? "",
+        parentId: parentId ?? null,
       },
+      include: { children: true },
     });
     return NextResponse.json({ success: true, data: category });
   } catch (err: unknown) {

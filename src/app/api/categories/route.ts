@@ -15,6 +15,7 @@ export async function GET() {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { name: "asc" },
+      include: { children: { orderBy: { name: "asc" } } },
     });
     return NextResponse.json({ success: true, data: categories });
   } catch (err) {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name, name_en } = await req.json();
+    const { name, name_en, parentId } = await req.json();
     if (!name?.trim()) {
       return NextResponse.json(
         { success: false, error: "El nombre de categoría es requerido" },
@@ -43,7 +44,9 @@ export async function POST(req: NextRequest) {
         name: name.trim(),
         slug: toSlug(name.trim()),
         name_en: name_en?.trim() ?? "",
+        parentId: parentId || null,
       },
+      include: { children: true },
     });
     return NextResponse.json({ success: true, data: category }, { status: 201 });
   } catch (err: unknown) {

@@ -18,12 +18,19 @@ export interface SiteConfigMap {
   site_description_en: string;
   artist_name: string;
 
-  // ── Hero (página principal) ─────────────────────────
+  // ── Hero ────────────────────────────────────────────
   hero_title: string;
   hero_title_en: string;
   hero_subtitle: string;
   hero_subtitle_en: string;
+  // Legacy single image
   hero_image_url: string;
+  // Videos por orientación
+  hero_video_desktop: string;
+  hero_video_mobile: string;
+  // Carrusel de imágenes (URLs separadas por comas)
+  hero_images_desktop: string;
+  hero_images_mobile: string;
   hero_cta_primary: string;
   hero_cta_primary_en: string;
   hero_cta_secondary: string;
@@ -65,6 +72,15 @@ export interface SiteConfigMap {
   meta_title_en: string;
   meta_description: string;
   meta_description_en: string;
+
+  // ── Email (SMTP) ────────────────────────────────────
+  smtp_host: string;
+  smtp_port: string;
+  smtp_secure: string;
+  smtp_user: string;
+  smtp_pass: string;
+  from_email: string;
+  admin_email: string;
 }
 
 export const CONFIG_DEFAULTS: SiteConfigMap = {
@@ -92,6 +108,10 @@ export const CONFIG_DEFAULTS: SiteConfigMap = {
     "Piezas únicas hechas a mano. Arte que transforma tu espacio y cuenta tu historia.",
   hero_subtitle_en: "",
   hero_image_url: "",
+  hero_video_desktop: "",
+  hero_video_mobile: "",
+  hero_images_desktop: "",
+  hero_images_mobile: "",
   hero_cta_primary: "Explorar Colección",
   hero_cta_primary_en: "",
   hero_cta_secondary: "Encargar Pieza",
@@ -141,6 +161,15 @@ export const CONFIG_DEFAULTS: SiteConfigMap = {
   meta_description:
     "Galería de arte contemporáneo. Murales, cuadros, camisetas y más, creados con pasión y dedicación.",
   meta_description_en: "",
+
+  // Email
+  smtp_host: "",
+  smtp_port: "587",
+  smtp_secure: "false",
+  smtp_user: "",
+  smtp_pass: "",
+  from_email: "",
+  admin_email: "",
 };
 
 // Fusiona los valores de la BD con los defaults

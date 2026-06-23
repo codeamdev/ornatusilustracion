@@ -6,6 +6,7 @@ import type { IProduct, ICategory } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { useLocale } from "@/context/LocaleContext";
+import { formatCOP } from "@/lib/format-price";
 
 interface ProductCardProps {
   product: IProduct;
@@ -49,12 +50,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          {/* Edition badge */}
-          <div className="absolute top-3 left-3">
-            <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-2.5 py-1">
-              {editionLabel || "Pieza única — 1/1"}
-            </span>
-          </div>
+          {/* Species badge */}
+          {product.species && (
+            <div className="absolute top-3 left-3">
+              <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-2.5 py-1">
+                {product.species}
+              </span>
+            </div>
+          )}
 
           {/* Stock badge — solo si showStock está activado */}
           {product.showStock && (
@@ -110,7 +113,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between mt-2">
           {product.price != null ? (
             <p className="text-sm font-medium text-gallery-black">
-              €{product.price.toFixed(2)}
+              {formatCOP(product.price)}
             </p>
           ) : (
             <p className="text-xs text-gallery-gray italic">{t("product.priceOnRequest")}</p>

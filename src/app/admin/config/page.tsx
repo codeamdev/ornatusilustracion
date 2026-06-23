@@ -75,7 +75,7 @@ const SECTIONS: Section[] = [
   },
   {
     title: "Hero (Página Principal)",
-    description: "Textos e imagen del banner principal.",
+    description: "Fondo del banner: video (prioridad) → carrusel de imágenes → color de fondo. Configura versiones para escritorio y móvil por separado.",
     fields: [
       {
         key: "hero_title",
@@ -95,8 +95,34 @@ const SECTIONS: Section[] = [
         en_placeholder: "Unique handmade pieces…",
       },
       {
+        key: "hero_video_desktop",
+        label: "Video — Escritorio (URL .mp4/.webm)",
+        type: "url",
+        placeholder: "https://… (horizontal, 16:9)",
+      },
+      {
+        key: "hero_video_mobile",
+        label: "Video — Móvil (URL .mp4/.webm)",
+        type: "url",
+        placeholder: "https://… (vertical, 9:16)",
+      },
+      {
+        key: "hero_images_desktop",
+        label: "Carrusel imágenes — Escritorio (URLs separadas por comas)",
+        type: "textarea",
+        rows: 2,
+        placeholder: "https://imagen1.jpg, https://imagen2.jpg, …",
+      },
+      {
+        key: "hero_images_mobile",
+        label: "Carrusel imágenes — Móvil (URLs separadas por comas)",
+        type: "textarea",
+        rows: 2,
+        placeholder: "https://imagen-vertical1.jpg, https://imagen-vertical2.jpg, …",
+      },
+      {
         key: "hero_image_url",
-        label: "URL de imagen del Hero",
+        label: "Imagen fallback (si no hay video ni carrusel)",
         type: "url",
         placeholder: "https://… (dejar vacío para usar imagen del primer producto)",
       },
@@ -246,6 +272,19 @@ const SECTIONS: Section[] = [
         en_key: "meta_description_en",
         en_placeholder: "Contemporary art gallery…",
       },
+    ],
+  },
+  {
+    title: "Correo Electrónico",
+    description: "Configuración SMTP para envío de emails de contacto y pedidos. Tiene prioridad sobre las variables de entorno del servidor.",
+    fields: [
+      { key: "smtp_host", label: "Servidor SMTP (host)", type: "text", placeholder: "smtp.gmail.com" },
+      { key: "smtp_port", label: "Puerto SMTP", type: "text", placeholder: "587" },
+      { key: "smtp_secure", label: "SSL/TLS (true/false)", type: "text", placeholder: "false" },
+      { key: "smtp_user", label: "Usuario SMTP", type: "email", placeholder: "tu@gmail.com" },
+      { key: "smtp_pass", label: "Contraseña / App Password", type: "text", placeholder: "••••••••" },
+      { key: "from_email", label: "Email remitente", type: "email", placeholder: "noreply@ornatus.art" },
+      { key: "admin_email", label: "Email del admin (recibe pedidos y mensajes)", type: "email", placeholder: "admin@ornatus.art" },
     ],
   },
 ];

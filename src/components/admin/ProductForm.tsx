@@ -63,6 +63,7 @@ export default function ProductForm({ product }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState(product?.name || "");
+  const [species, setSpecies] = useState(product?.species || "");
   const [description, setDescription] = useState(product?.description || "");
   const [descriptionEn, setDescriptionEn] = useState(product?.description_en || "");
   const [story, setStory] = useState(product?.story || "");
@@ -108,6 +109,7 @@ export default function ProductForm({ product }: ProductFormProps) {
 
     const body = {
       name,
+      species,
       description,
       description_en: descriptionEn,
       story,
@@ -169,6 +171,14 @@ export default function ProductForm({ product }: ProductFormProps) {
           required
         />
 
+        <Input
+          id="species"
+          label="Especie / Tipo de obra"
+          value={species}
+          onChange={(e) => setSpecies(e.target.value)}
+          placeholder="Ej: Mural, Cuadro, Cerámica, Textil, Ilustración…"
+        />
+
         <Textarea
           id="description"
           label="Descripción"
@@ -213,10 +223,15 @@ export default function ProductForm({ product }: ProductFormProps) {
               className="w-full border border-gallery-border bg-transparent p-2.5 text-sm text-gallery-black focus:outline-none focus:border-gallery-black transition-colors duration-300 rounded"
             >
               <option value="">Seleccionar...</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
+              {categories.filter((c) => !c.parentId).map((cat) => (
+                <optgroup key={cat.id} label={cat.name}>
+                  <option value={cat.id}>{cat.name}</option>
+                  {(cat.children ?? []).map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      &nbsp;&nbsp;↳ {sub.name}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>

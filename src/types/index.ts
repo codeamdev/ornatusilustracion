@@ -3,6 +3,8 @@ export interface ICategory {
   name: string;
   name_en: string;
   slug: string;
+  parentId?: string | null;
+  children?: ICategory[];
   createdAt: string;
 }
 
@@ -10,6 +12,7 @@ export interface IProduct {
   id: string;
   name: string;
   slug: string;
+  species: string;
   description: string;
   description_en: string;
   story: string;
