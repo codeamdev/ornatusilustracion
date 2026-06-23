@@ -4,11 +4,13 @@ import { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/context/ToastContext";
 import type { SiteConfigMap } from "@/lib/site-config";
 import { CONFIG_DEFAULTS } from "@/lib/site-config";
+import HeroVideoUpload from "@/components/admin/HeroVideoUpload";
+import HeroImagesUpload from "@/components/admin/HeroImagesUpload";
 
 type Field = {
   key: keyof SiteConfigMap;
   label: string;
-  type: "text" | "textarea" | "url" | "email" | "tel" | "color";
+  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "upload-video" | "upload-images";
   placeholder?: string;
   rows?: number;
   en_key?: keyof SiteConfigMap;
@@ -96,35 +98,23 @@ const SECTIONS: Section[] = [
       },
       {
         key: "hero_video_desktop",
-        label: "Video — Escritorio (URL .mp4/.webm)",
-        type: "url",
-        placeholder: "https://… (horizontal, 16:9)",
+        label: "Video — Escritorio (horizontal, 16:9)",
+        type: "upload-video",
       },
       {
         key: "hero_video_mobile",
-        label: "Video — Móvil (URL .mp4/.webm)",
-        type: "url",
-        placeholder: "https://… (vertical, 9:16)",
+        label: "Video — Móvil (vertical, 9:16)",
+        type: "upload-video",
       },
       {
         key: "hero_images_desktop",
-        label: "Carrusel imágenes — Escritorio (URLs separadas por comas)",
-        type: "textarea",
-        rows: 2,
-        placeholder: "https://imagen1.jpg, https://imagen2.jpg, …",
+        label: "Carrusel imágenes — Escritorio",
+        type: "upload-images",
       },
       {
         key: "hero_images_mobile",
-        label: "Carrusel imágenes — Móvil (URLs separadas por comas)",
-        type: "textarea",
-        rows: 2,
-        placeholder: "https://imagen-vertical1.jpg, https://imagen-vertical2.jpg, …",
-      },
-      {
-        key: "hero_image_url",
-        label: "Imagen fallback (si no hay video ni carrusel)",
-        type: "url",
-        placeholder: "https://… (dejar vacío para usar imagen del primer producto)",
+        label: "Carrusel imágenes — Móvil",
+        type: "upload-images",
       },
       {
         key: "hero_cta_primary",
@@ -398,6 +388,24 @@ export default function AdminConfigPage() {
   }
 
   function renderInput(field: Field) {
+    if (field.type === "upload-video") {
+      return (
+        <HeroVideoUpload
+          label=""
+          value={values[field.key] as string}
+          onChange={(url) => handleChange(field.key, url)}
+        />
+      );
+    }
+    if (field.type === "upload-images") {
+      return (
+        <HeroImagesUpload
+          label=""
+          value={values[field.key] as string}
+          onChange={(csv) => handleChange(field.key, csv)}
+        />
+      );
+    }
     if (field.type === "color") {
       return (
         <div className="flex items-center gap-3">

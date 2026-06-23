@@ -25,6 +25,20 @@ export async function saveImage(file: File): Promise<string> {
   return `/uploads/${filename}`;
 }
 
+export async function saveVideo(file: File): Promise<string> {
+  const dir = uploadsDir();
+  await mkdir(dir, { recursive: true });
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "mp4";
+  const filename = `${randomUUID()}.${ext}`;
+  const filepath = join(dir, filename);
+
+  const bytes = await file.arrayBuffer();
+  await writeFile(filepath, Buffer.from(bytes));
+
+  return `/uploads/${filename}`;
+}
+
 export async function deleteImage(url: string) {
   try {
     if (!url.startsWith("/uploads/")) return;
