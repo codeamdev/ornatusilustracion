@@ -115,15 +115,16 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Species — barra inferior de la imagen */}
-              {product.species && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gallery-black/60 backdrop-blur-sm px-4 py-2.5">
-                  <p className="text-white text-[11px] tracking-[0.25em] uppercase text-center">
-                    {product.species}
-                  </p>
-                </div>
-              )}
             </div>
+
+            {/* Species — debajo de la imagen */}
+            {product.species && (
+              <div className="bg-white px-4 py-2.5 border border-gallery-border/50">
+                <p className="text-gallery-black text-[11px] tracking-[0.25em] uppercase text-center">
+                  {product.species}
+                </p>
+              </div>
+            )}
 
             {/* Thumbnails */}
             {product.images.length > 1 && (
