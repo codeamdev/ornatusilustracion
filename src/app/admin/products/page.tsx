@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
 import { useToast } from "@/context/ToastContext";
 import type { IProduct, ICategory } from "@/types";
+import { formatCOP } from "@/lib/format-price";
 
 export default function AdminProductsPage() {
   const { toast } = useToast();
@@ -108,7 +109,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="p-4 hidden md:table-cell text-sm">
                     {product.price != null
-                      ? `€${product.price.toFixed(2)}`
+                      ? formatCOP(product.price)
                       : "—"}
                   </td>
                   <td className="p-4 hidden sm:table-cell">

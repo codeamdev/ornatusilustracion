@@ -54,7 +54,7 @@ export default function ImageUpload({ images, onChange }: ImageUploadProps) {
 
       <div className="flex flex-wrap gap-3 mb-3">
         {images.map((url, i) => (
-          <div key={i} className="relative w-24 h-24 bg-gallery-light group">
+          <div key={i} className="relative w-24 h-24 bg-gallery-light">
             <Image
               src={url}
               alt={`Image ${i + 1}`}
@@ -65,10 +65,16 @@ export default function ImageUpload({ images, onChange }: ImageUploadProps) {
             <button
               type="button"
               onClick={() => removeImage(i)}
-              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors"
+              title="Eliminar imagen"
             >
               ×
             </button>
+            {i === 0 && (
+              <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] text-center py-0.5 tracking-wide">
+                Principal
+              </span>
+            )}
           </div>
         ))}
 

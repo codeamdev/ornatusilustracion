@@ -5,6 +5,7 @@ import Spinner from "@/components/ui/Spinner";
 import Modal from "@/components/ui/Modal";
 import { useToast } from "@/context/ToastContext";
 import type { IOrder } from "@/types";
+import { formatCOP } from "@/lib/format-price";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "Pendiente", color: "bg-amber-100 text-amber-700" },
@@ -163,7 +164,7 @@ export default function AdminOrdersPage() {
                     </span>
                     <span className="text-gallery-gray">
                       {item.price != null
-                        ? `€${(item.price * item.quantity).toFixed(2)}`
+                        ? formatCOP(item.price * item.quantity)
                         : "Consultar"}
                     </span>
                   </li>
