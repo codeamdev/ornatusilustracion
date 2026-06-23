@@ -3,10 +3,16 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
-    remotePatterns: [
-      // Agrega aquí dominios externos si usas URLs de imágenes externas en la config
-      // { protocol: "https", hostname: "ejemplo.com" },
-    ],
+    remotePatterns: [],
+  },
+  // Redirect old /uploads/ URLs to the new /api/uploads/ route
+  async rewrites() {
+    return [
+      {
+        source: "/uploads/:filename",
+        destination: "/api/uploads/:filename",
+      },
+    ];
   },
 };
 

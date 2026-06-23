@@ -22,7 +22,7 @@ export async function saveImage(file: File): Promise<string> {
     .webp({ quality: 85 })
     .toFile(filepath);
 
-  return `/uploads/${filename}`;
+  return `/api/uploads/${filename}`;
 }
 
 export async function saveVideo(file: File): Promise<string> {
@@ -36,13 +36,14 @@ export async function saveVideo(file: File): Promise<string> {
   const bytes = await file.arrayBuffer();
   await writeFile(filepath, Buffer.from(bytes));
 
-  return `/uploads/${filename}`;
+  return `/api/uploads/${filename}`;
 }
 
 export async function deleteImage(url: string) {
   try {
-    if (!url.startsWith("/uploads/")) return;
-    const filename = url.split("/").pop();
+    const prefix = url.startsWith("/api/uploads/") ? "/api/uploads/" : "/uploads/";
+    if (!url.startsWith("/api/uploads/") && !url.startsWith("/uploads/")) return;
+    const filename = url.replace(prefix, "");
     if (!filename) return;
     await unlink(join(uploadsDir(), filename));
   } catch {
