@@ -50,15 +50,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          {/* Species badge */}
-          {product.species && (
-            <div className="absolute top-3 left-3">
-              <span className="bg-white/90 backdrop-blur-sm text-gallery-black text-[10px] tracking-[0.15em] uppercase px-2.5 py-1">
-                {product.species}
-              </span>
-            </div>
-          )}
-
           {/* Stock badge — solo si showStock está activado */}
           {product.showStock && (
             <div className="absolute top-3 right-3">
@@ -105,9 +96,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
-        {categoryName && (
+        {(categoryName || product.species) && (
           <p className="text-[11px] tracking-[0.15em] uppercase text-gallery-gray mt-0.5">
-            {categoryName}
+            {[product.species, categoryName].filter(Boolean).join(" · ")}
           </p>
         )}
         <div className="flex items-center justify-between mt-2">
