@@ -83,7 +83,7 @@ export default function ProductDetailPage() {
   return (
     <>
       {/* ── Above the fold: Image + Purchase panel ── */}
-      <section className="pt-24 md:pt-28 px-6 md:px-12 max-w-7xl mx-auto">
+      <section className="pt-24 md:pt-28 pb-8 md:pb-12 px-6 md:px-12 max-w-7xl mx-auto">
         <FadeIn>
           <Link
             href="/gallery"
@@ -299,7 +299,7 @@ export default function ProductDetailPage() {
 
       {/* ── Storytelling ── */}
       {hasStory && (
-        <section className="max-w-7xl mx-auto px-6 md:px-12 pb-20 md:pb-28">
+        <section className="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-20 md:pb-28">
           <div className="max-w-3xl">
             {p.story && (
               <FadeIn>
