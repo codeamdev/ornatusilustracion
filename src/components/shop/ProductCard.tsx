@@ -89,6 +89,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
 
+      {/* Species — debajo de la imagen, fondo blanco */}
+      {product.species && (
+        <div className="bg-white border border-t-0 border-gallery-border/50 px-3 py-2">
+          <p className="text-gallery-black text-[11px] tracking-[0.25em] uppercase text-center">
+            {product.species}
+          </p>
+        </div>
+      )}
+
       {/* Info + mobile CTA */}
       <div className="mt-3">
         <Link href={`/gallery/${product.slug}`}>
@@ -96,9 +105,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
-        {(categoryName || product.species) && (
+        {categoryName && (
           <p className="text-[11px] tracking-[0.15em] uppercase text-gallery-gray mt-0.5">
-            {[product.species, categoryName].filter(Boolean).join(" · ")}
+            {categoryName}
           </p>
         )}
         <div className="flex items-center justify-between mt-2">
