@@ -17,6 +17,7 @@ export interface SiteConfigMap {
   site_description: string;
   site_description_en: string;
   artist_name: string;
+  favicon_url: string;
 
   // ── Hero ────────────────────────────────────────────
   hero_title: string;
@@ -94,6 +95,7 @@ export const CONFIG_DEFAULTS: SiteConfigMap = {
 
   // Identidad
   site_name: "Ornatus",
+  favicon_url: "",
   site_tagline: "Arte Hecho a Mano",
   site_tagline_en: "",
   site_description:

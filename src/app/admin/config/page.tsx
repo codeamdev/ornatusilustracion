@@ -6,15 +6,18 @@ import type { SiteConfigMap } from "@/lib/site-config";
 import { CONFIG_DEFAULTS } from "@/lib/site-config";
 import HeroVideoUpload from "@/components/admin/HeroVideoUpload";
 import HeroImagesUpload from "@/components/admin/HeroImagesUpload";
+import SingleImageUpload from "@/components/admin/SingleImageUpload";
 
 type Field = {
   key: keyof SiteConfigMap;
   label: string;
-  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "upload-video" | "upload-images";
+  type: "text" | "textarea" | "url" | "email" | "tel" | "color" | "upload-video" | "upload-images" | "upload-image";
   placeholder?: string;
   rows?: number;
   en_key?: keyof SiteConfigMap;
   en_placeholder?: string;
+  hint?: string;
+  imageSize?: number;
 };
 
 type Section = {
@@ -54,6 +57,13 @@ const SECTIONS: Section[] = [
     title: "Identidad",
     description: "Nombre del sitio y datos generales de la marca.",
     fields: [
+      {
+        key: "favicon_url",
+        label: "Ícono del sitio (favicon)",
+        type: "upload-image",
+        hint: "Aparece en la pestaña del navegador. Recomendado: PNG cuadrado 512×512 o 32×32.",
+        imageSize: 56,
+      },
       { key: "site_name", label: "Nombre del sitio", type: "text", placeholder: "Ornatus" },
       {
         key: "site_tagline",
@@ -172,9 +182,10 @@ const SECTIONS: Section[] = [
     fields: [
       {
         key: "artist_portrait_url",
-        label: "URL del retrato",
-        type: "url",
-        placeholder: "/artist-portrait.jpg",
+        label: "Retrato de la artista",
+        type: "upload-image",
+        hint: "Imagen de perfil que aparece en la página 'Sobre mí'.",
+        imageSize: 80,
       },
       {
         key: "artist_bio_1",
@@ -388,6 +399,17 @@ export default function AdminConfigPage() {
   }
 
   function renderInput(field: Field) {
+    if (field.type === "upload-image") {
+      return (
+        <SingleImageUpload
+          label=""
+          value={values[field.key] as string}
+          onChange={(url) => handleChange(field.key, url)}
+          hint={field.hint}
+          size={field.imageSize ?? 64}
+        />
+      );
+    }
     if (field.type === "upload-video") {
       return (
         <HeroVideoUpload

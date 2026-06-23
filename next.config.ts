@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   output: "standalone",
   images: {
     remotePatterns: [],
+    localPatterns: [
+      { pathname: "/api/uploads/**" },
+      { pathname: "/uploads/**" },
+    ],
   },
   // Redirect old /uploads/ URLs to the new /api/uploads/ route
   async rewrites() {

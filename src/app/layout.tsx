@@ -25,13 +25,16 @@ export async function generateMetadata(): Promise<Metadata> {
   let description =
     "Galería de arte contemporáneo. Murales, cuadros, camisetas y más, creados con pasión y dedicación.";
 
+  let faviconUrl = "";
+
   try {
     const rows = await prisma.siteConfig.findMany({
-      where: { key: { in: ["meta_title", "meta_description"] } },
+      where: { key: { in: ["meta_title", "meta_description", "favicon_url"] } },
     });
     const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
     if (map.meta_title) title = map.meta_title;
     if (map.meta_description) description = map.meta_description;
+    if (map.favicon_url) faviconUrl = map.favicon_url;
   } catch {
     // BD no disponible — usar defaults
   }
@@ -42,6 +45,9 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(BASE_URL),
     title,
     description,
+    icons: faviconUrl
+      ? { icon: faviconUrl, shortcut: faviconUrl, apple: faviconUrl }
+      : undefined,
     ...(googleVerification && {
       verification: { google: googleVerification },
     }),
