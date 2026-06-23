@@ -115,6 +115,14 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
+              {/* Species — barra inferior de la imagen */}
+              {product.species && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gallery-black/60 backdrop-blur-sm px-4 py-2.5">
+                  <p className="text-white text-[11px] tracking-[0.25em] uppercase text-center">
+                    {product.species}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Thumbnails */}
@@ -140,9 +148,9 @@ export default function ProductDetailPage() {
           {/* Right: Purchase panel */}
           <FadeIn delay={150} className="lg:col-span-5">
             <div className="lg:sticky lg:top-28 space-y-6">
-              {(categoryName || product.species) && (
+              {categoryName && (
                 <p className="text-[11px] tracking-[0.3em] uppercase text-gallery-gray">
-                  {[product.species, categoryName].filter(Boolean).join(" · ")}
+                  {categoryName}
                 </p>
               )}
 
